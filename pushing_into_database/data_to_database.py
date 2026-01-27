@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 # 1. PostgreSQL connection
 # -----------------------------
 engine = create_engine(
-    "postgresql+psycopg2://postgres:2818@localhost:5432/youtube_trending_db"
+    "postgresql+psycopg2://postgres:PASSWORD@localhost:5432/youtube_trending_db"
 )
 
 # -----------------------------
