@@ -96,6 +96,16 @@ EMOTION_WORDS = {
 def root():
     return {"message": "YouTube Trending Predictor API is running"}
 
+@app.get("/model-info")
+def model_info():
+    return {
+        "text_features": text_scaler.n_features_in_,
+        "rf_features": rf_model.n_features_in_,
+        "psych_features": psych_scaler.n_features_in_,
+        "meta_features": meta_lr.n_features_in_
+    }
+
+
 @app.post("/predict")
 def predict(data: VideoInput):
 
