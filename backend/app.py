@@ -23,11 +23,15 @@ app.add_middleware(
 )
 
 # ==========================================
-# Absolute Model Paths (IMPORTANT FOR DEPLOY)
+# Paths (Render Compatible)
 # ==========================================
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR = os.path.join(BASE_DIR, "model")
+
+# ==========================================
+# Load Models
+# ==========================================
 
 text_lr = joblib.load(os.path.join(MODEL_DIR, "text_lr.pkl"))
 text_scaler = joblib.load(os.path.join(MODEL_DIR, "text_scaler.pkl"))
@@ -44,6 +48,7 @@ clip_values = joblib.load(os.path.join(MODEL_DIR, "clip_values.pkl"))
 vpv_clip = clip_values["vpv_clip"]
 spv_clip = clip_values["spv_clip"]
 
+# Important: Load once globally (not inside route)
 embedder = SentenceTransformer("sentence-transformers/LaBSE")
 
 # ==========================================
@@ -75,18 +80,10 @@ def has_any(text, word_set):
     text = f" {text} "
     return int(any(re.search(rf"\b{re.escape(w)}\b", text) for w in word_set))
 
-URGENCY_WORDS = {
-    "breaking","update","latest","alert","warning","today","now","live","urgent"
-}
-HYPE_WORDS = {
-    "viral","trending","trend","massive","huge","record","thriller"
-}
-OFFICIAL_WORDS = {
-    "official","announced","released","statement","report","confirms","results"
-}
-EMOTION_WORDS = {
-    "emotional","sad","angry","happy","proud","fear","panic","shocking"
-}
+URGENCY_WORDS = {"breaking","update","latest","alert","warning","today","now","live","urgent"}
+HYPE_WORDS = {"viral","trending","trend","massive","huge","record","thriller"}
+OFFICIAL_WORDS = {"official","announced","released","statement","report","confirms","results"}
+EMOTION_WORDS = {"emotional","sad","angry","happy","proud","fear","panic","shocking"}
 
 # ==========================================
 # Routes
@@ -105,7 +102,6 @@ def model_info():
         "meta_features": meta_lr.n_features_in_
     }
 
-
 @app.post("/predict")
 def predict(data: VideoInput):
 
@@ -118,7 +114,6 @@ def predict(data: VideoInput):
 
         emb = embedder.encode([combined_text], convert_to_numpy=True)
 
-        # Safety: if embedding mismatch ever happens
         if emb.shape[1] != text_scaler.n_features_in_:
             raise ValueError(
                 f"Embedding size mismatch. Got {emb.shape[1]}, expected {text_scaler.n_features_in_}"
@@ -127,12 +122,11 @@ def predict(data: VideoInput):
         emb_scaled = text_scaler.transform(emb)
         text_prob = text_lr.predict_proba(emb_scaled)[0][1]
 
-        # ---------- NUMERIC MODEL (ORIGINAL TRAINING LOGIC) ----------
+        # ---------- NUMERIC MODEL ----------
         vpv = min(data.views / max(1, data.vids), vpv_clip)
         spv = min(data.subs / max(1, data.vids), spv_clip)
 
         num_features = np.array([[
-
             np.log1p(data.duration),
             np.log1p(data.subs),
             np.log1p(data.views),
@@ -141,7 +135,6 @@ def predict(data: VideoInput):
             np.log1p(spv),
             int(data.vids > 5000 and data.subs > 500_000),
             0 if data.vids < 200 else 1 if data.vids < 1000 else 2 if data.vids < 5000 else 3
-
         ]])
 
         cat_df = pd.DataFrame({
@@ -178,7 +171,6 @@ def predict(data: VideoInput):
         overlap_ratio = len(title_words & desc_words) / max(1, len(title_words))
 
         psych_features = psych_scaler.transform([[
-
             has_urgency,
             has_hype,
             has_official,
@@ -187,7 +179,6 @@ def predict(data: VideoInput):
             has_qmark,
             has_excl,
             overlap_ratio
-
         ]])
 
         psych_prob = psych_lr.predict_proba(psych_features)[0][1]
