@@ -20,7 +20,7 @@ import streamlit as st
 @st.cache_resource
 def load_models():
 
-    embedder = SentenceTransformer("sentence-transformers/LaBSE", device="cpu")
+    embedder = SentenceTransformer("all-MiniLM-L6-v2", device="cpu")
 
     text_scaler = joblib.load(os.path.join(MODEL_DIR, "text_scaler.pkl"))
     text_lr = joblib.load(os.path.join(MODEL_DIR, "text_lr.pkl"))
