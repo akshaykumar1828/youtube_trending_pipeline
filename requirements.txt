@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+pydantic
+numpy
+pandas
+scikit-learn
+joblib
+sentence-transformers
+torch
+transformers
+tf-keras
+sqlalchemy
+psycopg2-binary
