@@ -1,0 +1,13 @@
+# Build context is the repository root. Allow-list: send ONLY what backend/Dockerfile copies.
+# (Never .env, .git, datasets, notebooks, the frontend, tests other than the checksum file.)
+*
+!backend/app/**
+!backend/requirements-api.lock
+!ml/**
+!model/*.pkl
+!deploy/labse/**
+!deploy/verify_artifacts.py
+!tests/fixtures/artifact_sha256.json
+**/__pycache__
+**/*.pyc
+**/.pytest_cache

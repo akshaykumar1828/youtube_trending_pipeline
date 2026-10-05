@@ -1,0 +1,7 @@
+dist
+coverage
+node_modules
+package-lock.json
+# Generated / captured from the backend; kept byte-exact (npm run api:snapshot, npm run api:types)
+openapi.json
+src/api/generated

@@ -1,0 +1,17 @@
+{
+  "directory": "model",
+  "algorithm": "sha256",
+  "files": {
+    "README.md": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "clip_values.pkl": "00eede8c4d2111ccc19360f2279d92d72db4e946c28cd1376ea2ce7882369552",
+    "final_model.ipynb": "b5cfde4328cccbd474beb79a55251eda7711530bb382bfd263cb0c2cd077662a",
+    "meta_lr.pkl": "d0074a55c7f08a7836d6510a164096fa5e247a5abf45cc8c69a03b0fa18b13ab",
+    "ohe.pkl": "1c93defa4b5f7b1b8525f795bcec2e5dacff45079d206d8dd302122797c5e0f8",
+    "psych_lr.pkl": "885eb3d5037f0a25f73192db591e63351dfa128389692900212ade7af15c88bc",
+    "psych_scaler.pkl": "231023b43193fcbb6f2de933be82c0c199beb8183770d75351c498846d2a0c33",
+    "rf_calibrated.pkl": "f208119a6e1deeccd405915d172365833038b25e248a3b675aa4c0b044ba106a",
+    "text_lr.pkl": "83f70b508b6acb175dfbf5b4296beb750adc863a79230f63834e33b9266d1ab0",
+    "text_scaler.pkl": "81ccb93f710f55c1e1ab7aa33ddc175595ad4fbd5c86ce787679002c4a866cac",
+    "urgency_words.txt": "31edaaf702afd3a500dcf668e1d760680504c8874a6f7b4a14dc37aa38b4a50a"
+  }
+}

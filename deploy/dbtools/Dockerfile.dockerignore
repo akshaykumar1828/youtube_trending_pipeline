@@ -1,0 +1,5 @@
+# Build context is the repository root. Allow-list only what deploy/dbtools/Dockerfile copies.
+*
+!backend/scripts/migrate.py
+!backend/migrations/**
+!deploy/dbtools/dbtools.sh

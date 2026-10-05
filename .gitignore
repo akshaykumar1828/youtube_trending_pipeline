@@ -1,5 +1,35 @@
+# Python environments and caches
 venv/
+.venv/
 __pycache__/
 *.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 .ipynb_checkpoints
+
+# Local configuration and secrets (only the example is committed)
 .env
+.env.*
+!.env.example
+
+# Deployment seed dump (copy of the raw YouTube tables; large, contains data, never committed)
+deploy/seed/*.dump
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*.orig
+*.swp
+*~
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Frontend build output and node_modules are ignored in frontend/.gitignore

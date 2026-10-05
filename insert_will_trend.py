@@ -1,8 +1,26 @@
+import os
+import sys
 import pandas as pd
+from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
+from sqlalchemy.engine import URL
 
+load_dotenv()
+
+missing = [v for v in ("DB_NAME", "DB_PASSWORD") if not os.getenv(v)]
+if missing:
+    sys.exit(f"Missing required environment variables: {', '.join(missing)}. See .env.example.")
+
+# URL.create escapes special characters in the password
 engine = create_engine(
-    "postgresql+psycopg2://postgres:PASSWORD@localhost:5432/youtube_trending_db"
+    URL.create(
+        "postgresql+psycopg2",
+        username=os.getenv("DB_USER", "postgres"),
+        password=os.environ["DB_PASSWORD"],
+        host=os.getenv("DB_HOST", "localhost"),
+        port=int(os.getenv("DB_PORT", "5432")),
+        database=os.environ["DB_NAME"],
+    )
 )
 
 tables = {

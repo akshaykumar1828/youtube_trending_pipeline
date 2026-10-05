@@ -1,0 +1,553 @@
+{
+  "generated_by": "predictor.py (unmodified, git HEAD)",
+  "cases": [
+    {
+      "name": "sports_baseline",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Sports",
+        "country": "IN",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 14200,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.9307,
+        "text_score": 0.7346,
+        "numeric_score": 0.8209,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "country_AU",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Sports",
+        "country": "AU",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 14200,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.9211,
+        "text_score": 0.7346,
+        "numeric_score": 0.8044,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "country_CA",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Sports",
+        "country": "CA",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 14200,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.885,
+        "text_score": 0.7346,
+        "numeric_score": 0.7552,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "country_GB",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Sports",
+        "country": "GB",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 14200,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.9128,
+        "text_score": 0.7346,
+        "numeric_score": 0.7915,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "country_IE",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Sports",
+        "country": "IE",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 14200,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.9012,
+        "text_score": 0.7346,
+        "numeric_score": 0.7752,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "country_NZ",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Sports",
+        "country": "NZ",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 14200,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.925,
+        "text_score": 0.7346,
+        "numeric_score": 0.8108,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "country_US",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Sports",
+        "country": "US",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 14200,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.9302,
+        "text_score": 0.7346,
+        "numeric_score": 0.82,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "country_ZA",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Sports",
+        "country": "ZA",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 14200,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.9288,
+        "text_score": 0.7346,
+        "numeric_score": 0.8173,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "music_hindi",
+      "input": {
+        "video_title": "ताजा खबर आज | नया गाना 2025",
+        "video_description": "आज का सबसे बड़ा गाना",
+        "video_tags": "hindi song,नया गाना",
+        "channel_title": "T-Series",
+        "video_category_id": "Music",
+        "country": "IN",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 14200,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.6969,
+        "text_score": 0.1959,
+        "numeric_score": 0.7175,
+        "psychology_score": 0.5195
+      }
+    },
+    {
+      "name": "news_tamil",
+      "input": {
+        "video_title": "இப்போ செய்தி | உடனடி",
+        "video_description": "செய்தி விவரங்கள்",
+        "video_tags": "tamil news",
+        "channel_title": "Oneindia Tamil",
+        "video_category_id": "News & Politics",
+        "country": "IN",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 14200,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.6652,
+        "text_score": 0.1002,
+        "numeric_score": 0.7207,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "gaming_punctuation",
+      "input": {
+        "video_title": "Is THIS the best build?! “Insane” — 100% win",
+        "video_description": "",
+        "video_tags": "",
+        "channel_title": "Pro Gamer",
+        "video_category_id": "Gaming",
+        "country": "IN",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 14200,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.5935,
+        "text_score": 0.2435,
+        "numeric_score": 0.6546,
+        "psychology_score": 0.5195
+      }
+    },
+    {
+      "name": "entertainment_question",
+      "input": {
+        "video_title": "Would you survive this?",
+        "video_description": "We tried it.",
+        "video_tags": "challenge",
+        "channel_title": "Fun Channel",
+        "video_category_id": "Entertainment",
+        "country": "IN",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 14200,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.7821,
+        "text_score": 0.615,
+        "numeric_score": 0.6889,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "comedy_exclaim",
+      "input": {
+        "video_title": "Funniest moments ever!",
+        "video_description": "Compilation",
+        "video_tags": "funny,comedy",
+        "channel_title": "LOL",
+        "video_category_id": "Comedy",
+        "country": "IN",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 14200,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.7792,
+        "text_score": 0.2192,
+        "numeric_score": 0.7649,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "empty_text",
+      "input": {
+        "video_title": "",
+        "video_description": "",
+        "video_tags": "",
+        "channel_title": "",
+        "video_category_id": "People & Blogs",
+        "country": "IN",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 14200,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.8631,
+        "text_score": 0.5644,
+        "numeric_score": 0.7653,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "bucket_edge_200",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Education",
+        "country": "IN",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 200,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.9602,
+        "text_score": 0.7346,
+        "numeric_score": 0.89,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "bucket_edge_1000",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Education",
+        "country": "IN",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 1000,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.9387,
+        "text_score": 0.7346,
+        "numeric_score": 0.8363,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "bucket_edge_5000",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Education",
+        "country": "IN",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 5000,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.8713,
+        "text_score": 0.7346,
+        "numeric_score": 0.7401,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "bucket_199",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Education",
+        "country": "IN",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 199,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.9598,
+        "text_score": 0.7346,
+        "numeric_score": 0.8886,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "zero_counts",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Howto & Style",
+        "country": "IN",
+        "video_duration_sec": 0,
+        "channel_subscriber_count": 0,
+        "channel_video_count": 0,
+        "channel_view_count": 0
+      },
+      "expected": {
+        "final_probability": 0.0224,
+        "text_score": 0.7346,
+        "numeric_score": 0.0701,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "above_clip_limits",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Film & Animation",
+        "country": "IN",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 100000000,
+        "channel_video_count": 1,
+        "channel_view_count": 100000000000
+      },
+      "expected": {
+        "final_probability": 0.9545,
+        "text_score": 0.7346,
+        "numeric_score": 0.8734,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "legacy_channel_true",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Science & Technology",
+        "country": "IN",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 600000,
+        "channel_video_count": 6000,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.3808,
+        "text_score": 0.7346,
+        "numeric_score": 0.4576,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "small_channel",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Travel & Events",
+        "country": "IN",
+        "video_duration_sec": 3600,
+        "channel_subscriber_count": 150,
+        "channel_video_count": 12,
+        "channel_view_count": 4200
+      },
+      "expected": {
+        "final_probability": 0.0186,
+        "text_score": 0.7346,
+        "numeric_score": 0.0474,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "autos",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Autos & Vehicles",
+        "country": "US",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 14200,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.8603,
+        "text_score": 0.7346,
+        "numeric_score": 0.729,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "pets",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Pets & Animals",
+        "country": "GB",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 14200,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.7905,
+        "text_score": 0.7346,
+        "numeric_score": 0.6713,
+        "psychology_score": 0.5634
+      }
+    },
+    {
+      "name": "float_duration",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "Music",
+        "country": "IN",
+        "video_duration_sec": 93.5,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 14200,
+        "channel_view_count": 19600000000
+      },
+      "expected": {
+        "final_probability": 0.8406,
+        "text_score": 0.7346,
+        "numeric_score": 0.7107,
+        "psychology_score": 0.5634
+      }
+    }
+  ],
+  "intentional_difference_cases": [
+    {
+      "name": "sports_id_17_legacy",
+      "input": {
+        "video_title": "Last Over Thriller | India vs Australia | Match Highlights",
+        "video_description": "An unbelievable finish in the final over as India defeats Australia. Watch the full highlights and reactions.",
+        "video_tags": "india vs australia,cricket highlights,last over thriller",
+        "channel_title": "Star Sports India",
+        "video_category_id": "17",
+        "country": "IN",
+        "video_duration_sec": 140,
+        "channel_subscriber_count": 8800000,
+        "channel_video_count": 14200,
+        "channel_view_count": 19600000000
+      },
+      "legacy_output": {
+        "final_probability": 0.8648,
+        "text_score": 0.7346,
+        "numeric_score": 0.7335,
+        "psychology_score": 0.5634
+      }
+    }
+  ]
+}

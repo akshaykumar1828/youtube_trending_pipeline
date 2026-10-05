@@ -1,0 +1,14 @@
+# Safety net. Each image has its own allow-list (backend/Dockerfile.dockerignore,
+# deploy/dbtools/Dockerfile.dockerignore, frontend/.dockerignore); this file applies only if
+# a build is run with the repository root as context and no Dockerfile-specific ignore file.
+.git
+.env
+.env.*
+**/node_modules
+**/dist
+**/__pycache__
+**/.pytest_cache
+dataset_csv_files
+accessing_from_databse
+deploy/seed
+**/*.ipynb

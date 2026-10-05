@@ -1,0 +1,133 @@
+# YouTube Trending Intelligence: production-style local deployment.
+#
+#   browser ──HTTP──▶ web (nginx: SPA + /api proxy, one origin) ──▶ api (FastAPI + frozen ML)
+#                                                                     │
+#                                                                     ▼
+#                                                                 db (PostgreSQL 18)
+#
+# Only `web` publishes a port (127.0.0.1:8080 by default). `api` and `db` sit on an internal
+# network with no published ports and no internet access. All credentials come from .env
+# (see .env.example); nothing secret is written in this file or baked into any image.
+# Setup and commands: DEPLOYMENT.md.
+
+name: yt-trending
+
+x-hardening: &hardening
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:?set DB_NAME in .env}
+      POSTGRES_USER: ${DB_USER:?set DB_USER in .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    volumes:
+      # PostgreSQL 18 images keep data under /var/lib/postgresql/18/docker.
+      - pgdata:/var/lib/postgresql
+    networks: [internal]
+    shm_size: 256mb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\" -h 127.0.0.1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+    stop_grace_period: 30s
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: yt-trending/api:latest
+    <<: *hardening
+    tmpfs: [/tmp]
+    environment:
+      # Application roles only: the API never receives the admin credentials.
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:?}
+      DB_APP_RO_USER: yt_app_ro
+      DB_APP_RO_PASSWORD: ${DB_APP_RO_PASSWORD:?set DB_APP_RO_PASSWORD in .env}
+      DB_AUTH_USER: yt_auth_rw
+      DB_AUTH_PASSWORD: ${DB_AUTH_PASSWORD:?set DB_AUTH_PASSWORD in .env}
+      AUTH_SECRET_KEY: ${AUTH_SECRET_KEY:?set AUTH_SECRET_KEY in .env}
+      APP_ENV: production
+      API_DOCS_ENABLED: "false"
+      # Same-origin deployment: the SPA and API share PUBLIC_ORIGIN, so CORS is not needed
+      # for the app itself; the list stays explicit (never "*").
+      CORS_ORIGINS: ${PUBLIC_ORIGIN:-http://localhost:8080}
+      AUTH_COOKIE_SECURE: ${AUTH_COOKIE_SECURE:-true}
+      AUTH_SESSION_TTL_MINUTES: ${AUTH_SESSION_TTL_MINUTES:-480}
+      AUTH_REGISTRATION_ENABLED: ${AUTH_REGISTRATION_ENABLED:-true}
+      AUTH_MAX_FAILED_LOGINS: ${AUTH_MAX_FAILED_LOGINS:-5}
+      AUTH_LOCKOUT_MINUTES: ${AUTH_LOCKOUT_MINUTES:-15}
+      ML_ENABLED: ${ML_ENABLED:-true}
+      ML_PRELOAD: "true"
+      MAX_REQUEST_BYTES: "65536"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [internal]
+    # Readiness (database reachable, read-only role, both app views readable). Uvicorn only
+    # answers after startup has loaded the ML model, hence the long start period.
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=4).status == 200 else 1)"]
+      interval: 30s
+      timeout: 6s
+      retries: 3
+      start_period: 300s
+    mem_limit: ${API_MEM_LIMIT:-4g}
+    restart: unless-stopped
+    stop_grace_period: 30s
+
+  web:
+    build:
+      context: frontend
+    image: yt-trending/web:latest
+    <<: *hardening
+    tmpfs: [/tmp, /var/cache/nginx]
+    ports:
+      - "${WEB_BIND:-127.0.0.1}:${WEB_PORT:-8080}:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks: [internal, edge]
+    restart: unless-stopped
+
+  # One-off tool, never started by `docker compose up` (profile "tools"):
+  #   docker compose run --rm dbtools seed | migrate | status
+  dbtools:
+    build:
+      context: .
+      dockerfile: deploy/dbtools/Dockerfile
+    image: yt-trending/dbtools:latest
+    profiles: [tools]
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME:?}
+      DB_USER: ${DB_USER:?}
+      DB_PASSWORD: ${DB_PASSWORD:?}
+      DB_APP_RO_PASSWORD: ${DB_APP_RO_PASSWORD:?}
+      DB_AUTH_PASSWORD: ${DB_AUTH_PASSWORD:?}
+    volumes:
+      - ./deploy/seed:/seed:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [internal]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+
+networks:
+  internal:
+    internal: true   # no published ports, no route to the internet
+  edge: {}
+
+volumes:
+  pgdata:

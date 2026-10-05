@@ -1,13 +1,30 @@
-fastapi
-uvicorn[standard]
-pydantic
+# Core data / ML
 numpy
 pandas
-scikit-learn
+# Pinned: model/*.pkl artifacts were pickled with scikit-learn 1.8.0
+scikit-learn==1.8.0
 joblib
 sentence-transformers
 torch
 transformers
-tf-keras
+
+# Streamlit dashboard (ui/)
+streamlit
+plotly
+
+# Database
 sqlalchemy
 psycopg2-binary
+
+# API (backend/app)
+fastapi
+uvicorn
+# Password hashing (Argon2id)
+argon2-cffi
+
+# YouTube ingestion (pushing_into_database/)
+google-api-python-client
+isodate
+
+# Configuration
+python-dotenv

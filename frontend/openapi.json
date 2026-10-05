@@ -1,0 +1,4705 @@
+{
+  "components": {
+    "schemas": {
+      "AppliedFilters": {
+        "description": "The filters actually applied after validation and defaults (default window: 30 days\nending at the database's latest trending date). Empty country/category lists mean all.",
+        "properties": {
+          "categories": {
+            "description": "Applied categories; empty = all categories.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Categories",
+            "type": "array"
+          },
+          "countries": {
+            "description": "Applied country codes; empty = all countries.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Countries",
+            "type": "array"
+          },
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "end_date": {
+            "format": "date",
+            "title": "End Date",
+            "type": "string"
+          },
+          "start_date": {
+            "format": "date",
+            "title": "Start Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start_date",
+          "end_date",
+          "days",
+          "countries",
+          "categories"
+        ],
+        "title": "AppliedFilters",
+        "type": "object"
+      },
+      "CategoryEngagement": {
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "p25": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P25"
+          },
+          "p50": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50"
+          },
+          "p75": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P75"
+          },
+          "videos": {
+            "title": "Videos",
+            "type": "integer"
+          },
+          "videos_with_views": {
+            "title": "Videos With Views",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "category",
+          "videos",
+          "videos_with_views",
+          "p25",
+          "p50",
+          "p75"
+        ],
+        "title": "CategoryEngagement",
+        "type": "object"
+      },
+      "CategoryPerformance": {
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "engagement_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "VIDEO-LEVEL: (SUM(likes) + SUM(comments)) / SUM(views); null when views sum to 0.",
+            "title": "Engagement Rate"
+          },
+          "trending_volume": {
+            "description": "SNAPSHOT-LEVEL: filtered snapshots whose own category is this one.",
+            "title": "Trending Volume",
+            "type": "integer"
+          },
+          "unique_videos": {
+            "description": "VIDEO-LEVEL: videos whose latest snapshot within the filtered dataset is in this category (sums to the overall unique video count).",
+            "title": "Unique Videos",
+            "type": "integer"
+          },
+          "views": {
+            "description": "VIDEO-LEVEL: sum of those latest snapshots' view_count (once per video).",
+            "title": "Views",
+            "type": "integer"
+          },
+          "volume_share_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SNAPSHOT-LEVEL: trending_volume / all filtered snapshots * 100.",
+            "title": "Volume Share Pct"
+          }
+        },
+        "required": [
+          "category",
+          "trending_volume",
+          "volume_share_pct",
+          "unique_videos",
+          "views",
+          "engagement_rate"
+        ],
+        "title": "CategoryPerformance",
+        "type": "object"
+      },
+      "ChannelInfo": {
+        "properties": {
+          "channel_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel Id"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "custom_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Custom Url"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "hidden_subscribers": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hidden Subscribers"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "subscribers": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subscribers"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "total_views": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Views"
+          },
+          "video_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Video Count"
+          }
+        },
+        "required": [
+          "channel_id",
+          "title",
+          "description",
+          "custom_url",
+          "country",
+          "published_at",
+          "subscribers",
+          "hidden_subscribers",
+          "total_views",
+          "video_count"
+        ],
+        "title": "ChannelInfo",
+        "type": "object"
+      },
+      "ChannelPerformance": {
+        "properties": {
+          "channel_id": {
+            "title": "Channel Id",
+            "type": "string"
+          },
+          "channel_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "From the channel's most recent filtered snapshot.",
+            "title": "Channel Title"
+          },
+          "engagement_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "VIDEO-LEVEL: (SUM(likes) + SUM(comments)) / SUM(views); null when views sum to 0.",
+            "title": "Engagement Rate"
+          },
+          "subscribers": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "From the channel's most recent filtered snapshot.",
+            "title": "Subscribers"
+          },
+          "trending_volume": {
+            "description": "SNAPSHOT-LEVEL: filtered snapshots of the channel's videos.",
+            "title": "Trending Volume",
+            "type": "integer"
+          },
+          "unique_videos": {
+            "description": "VIDEO-LEVEL: videos whose latest filtered snapshot belongs to the channel.",
+            "title": "Unique Videos",
+            "type": "integer"
+          },
+          "views": {
+            "description": "VIDEO-LEVEL: sum of those latest snapshots' view_count.",
+            "title": "Views",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "channel_id",
+          "channel_title",
+          "subscribers",
+          "unique_videos",
+          "trending_volume",
+          "views",
+          "engagement_rate"
+        ],
+        "title": "ChannelPerformance",
+        "type": "object"
+      },
+      "ChannelSort": {
+        "enum": [
+          "unique_videos",
+          "trending_volume",
+          "views"
+        ],
+        "title": "ChannelSort",
+        "type": "string"
+      },
+      "CountMetric": {
+        "properties": {
+          "change_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Percent change vs the previous period: (value - previous) / previous * 100. Null when the previous period is unavailable or its value is 0.",
+            "title": "Change Pct"
+          },
+          "previous": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous"
+          },
+          "value": {
+            "title": "Value",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "value",
+          "previous",
+          "change_pct"
+        ],
+        "title": "CountMetric",
+        "type": "object"
+      },
+      "CountryOption": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "name"
+        ],
+        "title": "CountryOption",
+        "type": "object"
+      },
+      "CountryPerformance": {
+        "properties": {
+          "country_code": {
+            "title": "Country Code",
+            "type": "string"
+          },
+          "country_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country Name"
+          },
+          "engagement_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "COUNTRY-LEVEL: (SUM(likes) + SUM(comments)) / SUM(views); null when views sum to 0.",
+            "title": "Engagement Rate"
+          },
+          "trending_volume": {
+            "description": "SNAPSHOT-LEVEL: filtered snapshots in this country.",
+            "title": "Trending Volume",
+            "type": "integer"
+          },
+          "unique_videos": {
+            "description": "COUNTRY-LEVEL: videos that trended in this country within the filters. A video trending in several countries counts in each.",
+            "title": "Unique Videos",
+            "type": "integer"
+          },
+          "views_of_trending_videos": {
+            "description": "COUNTRY-LEVEL: sum of the GLOBAL lifetime view_count of each video's latest filtered snapshot in this country. These are NOT views from this country and are NOT additive across countries.",
+            "title": "Views Of Trending Videos",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "country_code",
+          "country_name",
+          "trending_volume",
+          "unique_videos",
+          "views_of_trending_videos",
+          "engagement_rate"
+        ],
+        "title": "CountryPerformance",
+        "type": "object"
+      },
+      "CreateMemberRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Display Name",
+            "type": "string"
+          },
+          "email": {
+            "maxLength": 320,
+            "title": "Email",
+            "type": "string"
+          },
+          "password": {
+            "description": "Initial password (12 to 128 characters); share it securely.",
+            "maxLength": 1024,
+            "title": "Password",
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role",
+            "default": "MEMBER"
+          }
+        },
+        "required": [
+          "email",
+          "display_name",
+          "password"
+        ],
+        "title": "CreateMemberRequest",
+        "type": "object"
+      },
+      "CurrentUser": {
+        "properties": {
+          "tenant": {
+            "$ref": "#/components/schemas/TenantOut"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserOut"
+          }
+        },
+        "required": [
+          "user",
+          "tenant"
+        ],
+        "title": "CurrentUser",
+        "type": "object"
+      },
+      "DailyPoint": {
+        "properties": {
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "trending_volume": {
+            "description": "SNAPSHOT-LEVEL: snapshots on this date.",
+            "title": "Trending Volume",
+            "type": "integer"
+          },
+          "unique_videos": {
+            "description": "VIDEO-LEVEL: distinct videos on this date (a video trending in several selected countries that day counts once).",
+            "title": "Unique Videos",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "date",
+          "trending_volume",
+          "unique_videos"
+        ],
+        "title": "DailyPoint",
+        "type": "object"
+      },
+      "DailySeries": {
+        "properties": {
+          "key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Country code or category for split series; null when not split.",
+            "title": "Key"
+          },
+          "points": {
+            "description": "Every calendar date in the range, zero-filled.",
+            "items": {
+              "$ref": "#/components/schemas/DailyPoint"
+            },
+            "title": "Points",
+            "type": "array"
+          }
+        },
+        "required": [
+          "key",
+          "points"
+        ],
+        "title": "DailySeries",
+        "type": "object"
+      },
+      "DailySplit": {
+        "enum": [
+          "country",
+          "category"
+        ],
+        "title": "DailySplit",
+        "type": "string"
+      },
+      "DailyVolume": {
+        "description": "Daily trending activity. No daily views: view counts are cumulative lifetime totals.",
+        "properties": {
+          "series": {
+            "items": {
+              "$ref": "#/components/schemas/DailySeries"
+            },
+            "title": "Series",
+            "type": "array"
+          },
+          "split_by": {
+            "anyOf": [
+              {
+                "enum": [
+                  "country",
+                  "category"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Split By"
+          }
+        },
+        "required": [
+          "split_by",
+          "series"
+        ],
+        "title": "DailyVolume",
+        "type": "object"
+      },
+      "DataResponse_CurrentUser_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/CurrentUser"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[CurrentUser]",
+        "type": "object"
+      },
+      "DataResponse_FilterOptions_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/FilterOptions"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[FilterOptions]",
+        "type": "object"
+      },
+      "DataResponse_LogoutResult_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/LogoutResult"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[LogoutResult]",
+        "type": "object"
+      },
+      "DataResponse_Member_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Member"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[Member]",
+        "type": "object"
+      },
+      "DataResponse_ModelInfo_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/ModelInfo"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[ModelInfo]",
+        "type": "object"
+      },
+      "DataResponse_Prediction_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Prediction"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[Prediction]",
+        "type": "object"
+      },
+      "DataResponse_TenantDetail_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/TenantDetail"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[TenantDetail]",
+        "type": "object"
+      },
+      "DataResponse_VideoDetail_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/VideoDetail"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[VideoDetail]",
+        "type": "object"
+      },
+      "DataResponse_list_HistoryPoint__": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/HistoryPoint"
+            },
+            "title": "Data",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[list[HistoryPoint]]",
+        "type": "object"
+      },
+      "DataResponse_list_Member__": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/Member"
+            },
+            "title": "Data",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "title": "DataResponse[list[Member]]",
+        "type": "object"
+      },
+      "DateRange": {
+        "properties": {
+          "max_date": {
+            "format": "date",
+            "title": "Max Date",
+            "type": "string"
+          },
+          "min_date": {
+            "format": "date",
+            "title": "Min Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "min_date",
+          "max_date"
+        ],
+        "title": "DateRange",
+        "type": "object"
+      },
+      "DefaultRange": {
+        "properties": {
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "end_date": {
+            "format": "date",
+            "title": "End Date",
+            "type": "string"
+          },
+          "start_date": {
+            "format": "date",
+            "title": "Start Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start_date",
+          "end_date",
+          "days"
+        ],
+        "title": "DefaultRange",
+        "type": "object"
+      },
+      "EngagementAnalysis": {
+        "description": "VIDEO-LEVEL engagement over each video's latest snapshot within the filtered dataset.\nHidden like counts are stored as 0 and counted as 0.",
+        "properties": {
+          "by_category": {
+            "items": {
+              "$ref": "#/components/schemas/CategoryEngagement"
+            },
+            "title": "By Category",
+            "type": "array"
+          },
+          "distribution": {
+            "$ref": "#/components/schemas/EngagementDistribution"
+          },
+          "histogram": {
+            "description": "1-point buckets 0-10% plus '>= 10%'; all buckets returned.",
+            "items": {
+              "$ref": "#/components/schemas/HistogramBucket"
+            },
+            "title": "Histogram",
+            "type": "array"
+          },
+          "scatter": {
+            "description": "Top videos by views (ties: video_id).",
+            "items": {
+              "$ref": "#/components/schemas/ScatterPoint"
+            },
+            "title": "Scatter",
+            "type": "array"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/EngagementTotals"
+          }
+        },
+        "required": [
+          "totals",
+          "distribution",
+          "histogram",
+          "by_category",
+          "scatter"
+        ],
+        "title": "EngagementAnalysis",
+        "type": "object"
+      },
+      "EngagementDistribution": {
+        "description": "Percentiles (linear interpolation) of per-video engagement rate, videos with views > 0.",
+        "properties": {
+          "p25": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P25"
+          },
+          "p50": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50"
+          },
+          "p75": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P75"
+          },
+          "p90": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P90"
+          }
+        },
+        "required": [
+          "p25",
+          "p50",
+          "p75",
+          "p90"
+        ],
+        "title": "EngagementDistribution",
+        "type": "object"
+      },
+      "EngagementTotals": {
+        "properties": {
+          "comments": {
+            "title": "Comments",
+            "type": "integer"
+          },
+          "engagement_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Aggregate rate; equals the overview KPI for the same filters.",
+            "title": "Engagement Rate"
+          },
+          "likes": {
+            "title": "Likes",
+            "type": "integer"
+          },
+          "videos": {
+            "title": "Videos",
+            "type": "integer"
+          },
+          "videos_without_views": {
+            "description": "Videos excluded from per-video rates because views are 0.",
+            "title": "Videos Without Views",
+            "type": "integer"
+          },
+          "views": {
+            "title": "Views",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "videos",
+          "videos_without_views",
+          "views",
+          "likes",
+          "comments",
+          "engagement_rate"
+        ],
+        "title": "EngagementTotals",
+        "type": "object"
+      },
+      "ErrorBody": {
+        "properties": {
+          "code": {
+            "description": "Stable machine-readable error code.",
+            "title": "Code",
+            "type": "string"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ErrorDetail"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Details"
+          },
+          "field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Same value as the X-Request-ID response header.",
+            "title": "Request Id"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorBody",
+        "type": "object"
+      },
+      "ErrorDetail": {
+        "properties": {
+          "field": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorBody"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "FilterOptions": {
+        "properties": {
+          "categories": {
+            "description": "Categories present in the data ('Unknown' = missing category).",
+            "items": {
+              "type": "string"
+            },
+            "title": "Categories",
+            "type": "array"
+          },
+          "countries": {
+            "description": "Countries present in the data.",
+            "items": {
+              "$ref": "#/components/schemas/CountryOption"
+            },
+            "title": "Countries",
+            "type": "array"
+          },
+          "date_range": {
+            "$ref": "#/components/schemas/DateRange",
+            "description": "Earliest and latest trending dates in the data."
+          },
+          "default_range": {
+            "$ref": "#/components/schemas/DefaultRange",
+            "description": "Default window used when no dates are given: 30 days ending at the latest trending date."
+          }
+        },
+        "required": [
+          "countries",
+          "categories",
+          "date_range",
+          "default_range"
+        ],
+        "title": "FilterOptions",
+        "type": "object"
+      },
+      "FilteredResponse_DailyVolume_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/DailyVolume"
+          },
+          "filters": {
+            "$ref": "#/components/schemas/AppliedFilters"
+          }
+        },
+        "required": [
+          "filters",
+          "data"
+        ],
+        "title": "FilteredResponse[DailyVolume]",
+        "type": "object"
+      },
+      "FilteredResponse_EngagementAnalysis_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/EngagementAnalysis"
+          },
+          "filters": {
+            "$ref": "#/components/schemas/AppliedFilters"
+          }
+        },
+        "required": [
+          "filters",
+          "data"
+        ],
+        "title": "FilteredResponse[EngagementAnalysis]",
+        "type": "object"
+      },
+      "FilteredResponse_Kpis_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Kpis"
+          },
+          "filters": {
+            "$ref": "#/components/schemas/AppliedFilters"
+          }
+        },
+        "required": [
+          "filters",
+          "data"
+        ],
+        "title": "FilteredResponse[Kpis]",
+        "type": "object"
+      },
+      "FilteredResponse_VideoPage_": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/VideoPage"
+          },
+          "filters": {
+            "$ref": "#/components/schemas/AppliedFilters"
+          }
+        },
+        "required": [
+          "filters",
+          "data"
+        ],
+        "title": "FilteredResponse[VideoPage]",
+        "type": "object"
+      },
+      "FilteredResponse_list_CategoryPerformance__": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/CategoryPerformance"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "filters": {
+            "$ref": "#/components/schemas/AppliedFilters"
+          }
+        },
+        "required": [
+          "filters",
+          "data"
+        ],
+        "title": "FilteredResponse[list[CategoryPerformance]]",
+        "type": "object"
+      },
+      "FilteredResponse_list_ChannelPerformance__": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/ChannelPerformance"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "filters": {
+            "$ref": "#/components/schemas/AppliedFilters"
+          }
+        },
+        "required": [
+          "filters",
+          "data"
+        ],
+        "title": "FilteredResponse[list[ChannelPerformance]]",
+        "type": "object"
+      },
+      "FilteredResponse_list_CountryPerformance__": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/CountryPerformance"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "filters": {
+            "$ref": "#/components/schemas/AppliedFilters"
+          }
+        },
+        "required": [
+          "filters",
+          "data"
+        ],
+        "title": "FilteredResponse[list[CountryPerformance]]",
+        "type": "object"
+      },
+      "HistogramBucket": {
+        "properties": {
+          "lower_pct": {
+            "title": "Lower Pct",
+            "type": "number"
+          },
+          "upper_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Exclusive upper bound in percent; null for the open '>= 10%' bucket.",
+            "title": "Upper Pct"
+          },
+          "videos": {
+            "title": "Videos",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "lower_pct",
+          "upper_pct",
+          "videos"
+        ],
+        "title": "HistogramBucket",
+        "type": "object"
+      },
+      "HistoryPoint": {
+        "description": "One trending snapshot (country x day). Views are the global lifetime count at that snapshot;\ndo not sum them across snapshots.",
+        "properties": {
+          "comments": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comments"
+          },
+          "country_code": {
+            "title": "Country Code",
+            "type": "string"
+          },
+          "country_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country Name"
+          },
+          "engagement_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engagement Rate"
+          },
+          "likes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Likes"
+          },
+          "trending_date": {
+            "format": "date",
+            "title": "Trending Date",
+            "type": "string"
+          },
+          "views": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Views"
+          }
+        },
+        "required": [
+          "country_code",
+          "country_name",
+          "trending_date",
+          "views",
+          "likes",
+          "comments",
+          "engagement_rate"
+        ],
+        "title": "HistoryPoint",
+        "type": "object"
+      },
+      "Kpis": {
+        "description": "Overview KPIs for the filtered period and the immediately preceding period of equal length\n(same countries and categories).",
+        "properties": {
+          "engagement_rate": {
+            "$ref": "#/components/schemas/RateMetric",
+            "description": "VIDEO-LEVEL: (SUM(likes) + SUM(comments)) / SUM(views) over the same latest snapshots. Change is in percentage points."
+          },
+          "period": {
+            "$ref": "#/components/schemas/Period"
+          },
+          "previous_period": {
+            "$ref": "#/components/schemas/PreviousPeriod"
+          },
+          "trending_volume": {
+            "$ref": "#/components/schemas/CountMetric",
+            "description": "SNAPSHOT-LEVEL: number of filtered snapshot rows (country x video x day appearances)."
+          },
+          "unique_channels": {
+            "$ref": "#/components/schemas/CountMetric",
+            "description": "SNAPSHOT-LEVEL: distinct channels among filtered snapshots."
+          },
+          "unique_videos": {
+            "$ref": "#/components/schemas/CountMetric",
+            "description": "VIDEO-LEVEL: COUNT(DISTINCT video_id) among filtered snapshots."
+          },
+          "views": {
+            "$ref": "#/components/schemas/CountMetric",
+            "description": "VIDEO-LEVEL: sum of view_count from each video's latest snapshot within the filtered dataset, counted once per video. Views are never summed across historical snapshots. View counts are lifetime totals, so the change compares the videos trending in each period, not views gained."
+          }
+        },
+        "required": [
+          "period",
+          "previous_period",
+          "unique_videos",
+          "trending_volume",
+          "views",
+          "unique_channels",
+          "engagement_rate"
+        ],
+        "title": "Kpis",
+        "type": "object"
+      },
+      "LoginRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "maxLength": 320,
+            "title": "Email",
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Password",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "LoginRequest",
+        "type": "object"
+      },
+      "LogoutResult": {
+        "properties": {
+          "status": {
+            "const": "logged_out",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "LogoutResult",
+        "type": "object"
+      },
+      "Member": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "last_login_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Login At"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "display_name",
+          "role",
+          "is_active",
+          "created_at",
+          "last_login_at"
+        ],
+        "title": "Member",
+        "type": "object"
+      },
+      "ModelInfo": {
+        "properties": {
+          "category_input": {
+            "title": "Category Input",
+            "type": "string"
+          },
+          "components": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Components",
+            "type": "object"
+          },
+          "label_definition": {
+            "title": "Label Definition",
+            "type": "string"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "not_a_prediction_of": {
+            "title": "Not A Prediction Of",
+            "type": "string"
+          },
+          "output": {
+            "title": "Output",
+            "type": "string"
+          },
+          "reported_metrics": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Reported Metrics",
+            "type": "object"
+          },
+          "supported_categories": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Supported Categories",
+            "type": "array"
+          },
+          "supported_countries": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Supported Countries",
+            "type": "array"
+          },
+          "training_data": {
+            "title": "Training Data",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "version",
+          "output",
+          "label_definition",
+          "not_a_prediction_of",
+          "training_data",
+          "supported_countries",
+          "supported_categories",
+          "category_input",
+          "components",
+          "reported_metrics",
+          "limitations"
+        ],
+        "title": "ModelInfo",
+        "type": "object"
+      },
+      "Period": {
+        "properties": {
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "end_date": {
+            "format": "date",
+            "title": "End Date",
+            "type": "string"
+          },
+          "start_date": {
+            "format": "date",
+            "title": "Start Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start_date",
+          "end_date",
+          "days"
+        ],
+        "title": "Period",
+        "type": "object"
+      },
+      "Permission": {
+        "enum": [
+          "VIEW_ANALYTICS",
+          "MAKE_PREDICTION",
+          "MANAGE_USERS"
+        ],
+        "title": "Permission",
+        "type": "string"
+      },
+      "Prediction": {
+        "properties": {
+          "components": {
+            "$ref": "#/components/schemas/PredictionComponents"
+          },
+          "high_performance_probability": {
+            "description": "Model score that a video which IS ALREADY TRENDING performs at or above its country's thresholds for views, likes and comments. It is NOT a probability that an arbitrary video will become trending.",
+            "title": "High Performance Probability",
+            "type": "number"
+          },
+          "inputs_used": {
+            "$ref": "#/components/schemas/PredictionInputsUsed"
+          },
+          "model": {
+            "$ref": "#/components/schemas/PredictionModelRef"
+          }
+        },
+        "required": [
+          "high_performance_probability",
+          "components",
+          "inputs_used",
+          "model"
+        ],
+        "title": "Prediction",
+        "type": "object"
+      },
+      "PredictionComponents": {
+        "properties": {
+          "channel_and_numeric": {
+            "description": "Channel statistics, duration, category and country sub-model.",
+            "title": "Channel And Numeric",
+            "type": "number"
+          },
+          "psychology": {
+            "description": "Title-signal sub-model (see model-info limitations).",
+            "title": "Psychology",
+            "type": "number"
+          },
+          "text": {
+            "description": "Text sub-model (LaBSE embedding of channel, title, description, tags).",
+            "title": "Text",
+            "type": "number"
+          }
+        },
+        "required": [
+          "text",
+          "channel_and_numeric",
+          "psychology"
+        ],
+        "title": "PredictionComponents",
+        "type": "object"
+      },
+      "PredictionInputsUsed": {
+        "properties": {
+          "category": {
+            "description": "Category name sent to the model (IDs are converted).",
+            "title": "Category",
+            "type": "string"
+          },
+          "country": {
+            "title": "Country",
+            "type": "string"
+          }
+        },
+        "required": [
+          "category",
+          "country"
+        ],
+        "title": "PredictionInputsUsed",
+        "type": "object"
+      },
+      "PredictionModelRef": {
+        "properties": {
+          "label_definition": {
+            "title": "Label Definition",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "version",
+          "label_definition"
+        ],
+        "title": "PredictionModelRef",
+        "type": "object"
+      },
+      "PredictionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "category": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "description": "Category name (e.g. 'Sports') or YouTube category ID (e.g. 17). See /api/v1/predictions/model-info for supported values.",
+            "title": "Category"
+          },
+          "channel_subscriber_count": {
+            "maximum": 10000000000,
+            "minimum": 0,
+            "title": "Channel Subscriber Count",
+            "type": "integer"
+          },
+          "channel_title": {
+            "default": "",
+            "maxLength": 200,
+            "title": "Channel Title",
+            "type": "string"
+          },
+          "channel_video_count": {
+            "maximum": 100000000,
+            "minimum": 0,
+            "title": "Channel Video Count",
+            "type": "integer"
+          },
+          "channel_view_count": {
+            "maximum": 10000000000000,
+            "minimum": 0,
+            "title": "Channel View Count",
+            "type": "integer"
+          },
+          "country": {
+            "description": "Country code; see model-info for supported values.",
+            "maxLength": 8,
+            "title": "Country",
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "maxLength": 5000,
+            "title": "Description",
+            "type": "string"
+          },
+          "duration_sec": {
+            "maximum": 604800,
+            "minimum": 0,
+            "title": "Duration Sec",
+            "type": "number"
+          },
+          "tags": {
+            "description": "Joined with ',' before reaching the model (the stored tag format).",
+            "items": {
+              "maxLength": 100,
+              "type": "string"
+            },
+            "maxItems": 50,
+            "title": "Tags",
+            "type": "array"
+          },
+          "title": {
+            "maxLength": 200,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "category",
+          "country",
+          "duration_sec",
+          "channel_subscriber_count",
+          "channel_video_count",
+          "channel_view_count"
+        ],
+        "title": "PredictionRequest",
+        "type": "object"
+      },
+      "PreviousPeriod": {
+        "properties": {
+          "available": {
+            "description": "False when the previous period starts before the first date in the data; previous values and changes are then null.",
+            "title": "Available",
+            "type": "boolean"
+          },
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "end_date": {
+            "format": "date",
+            "title": "End Date",
+            "type": "string"
+          },
+          "start_date": {
+            "format": "date",
+            "title": "Start Date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start_date",
+          "end_date",
+          "days",
+          "available"
+        ],
+        "title": "PreviousPeriod",
+        "type": "object"
+      },
+      "RateMetric": {
+        "properties": {
+          "change_pts": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Change in PERCENTAGE POINTS: (value - previous) * 100. Null when either rate is missing.",
+            "title": "Change Pts"
+          },
+          "previous": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value",
+          "previous",
+          "change_pts"
+        ],
+        "title": "RateMetric",
+        "type": "object"
+      },
+      "RegisterRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Display Name",
+            "type": "string"
+          },
+          "email": {
+            "maxLength": 320,
+            "title": "Email",
+            "type": "string"
+          },
+          "password": {
+            "description": "12 to 128 characters.",
+            "maxLength": 1024,
+            "title": "Password",
+            "type": "string"
+          },
+          "tenant_name": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Workspace name. Default: '<display_name>'s workspace'.",
+            "title": "Tenant Name"
+          }
+        },
+        "required": [
+          "email",
+          "password",
+          "display_name"
+        ],
+        "title": "RegisterRequest",
+        "type": "object"
+      },
+      "Role": {
+        "enum": [
+          "OWNER",
+          "ADMIN",
+          "MEMBER"
+        ],
+        "title": "Role",
+        "type": "string"
+      },
+      "ScatterPoint": {
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "engagement_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engagement Rate"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "video_id": {
+            "title": "Video Id",
+            "type": "string"
+          },
+          "views": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Views"
+          }
+        },
+        "required": [
+          "video_id",
+          "title",
+          "category",
+          "views",
+          "engagement_rate"
+        ],
+        "title": "ScatterPoint",
+        "type": "object"
+      },
+      "SortOrder": {
+        "enum": [
+          "asc",
+          "desc"
+        ],
+        "title": "SortOrder",
+        "type": "string"
+      },
+      "TenantDetail": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "member_count": {
+            "title": "Member Count",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "created_at",
+          "member_count"
+        ],
+        "title": "TenantDetail",
+        "type": "object"
+      },
+      "TenantOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "TenantOut",
+        "type": "object"
+      },
+      "UpdateMemberRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "is_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "false signs the user out everywhere and blocks sign-in.",
+            "title": "Is Active"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Role"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "UpdateMemberRequest",
+        "type": "object"
+      },
+      "UserOut": {
+        "properties": {
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "permissions": {
+            "description": "Derived from the role on the server.",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            },
+            "title": "Permissions",
+            "type": "array"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "display_name",
+          "role",
+          "permissions"
+        ],
+        "title": "UserOut",
+        "type": "object"
+      },
+      "VideoDetail": {
+        "description": "From app.video_details: the video's GLOBALLY latest snapshot (latest date, then highest\nviews, then country code) plus its full lifecycle summary. Not affected by filters.",
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "channel": {
+            "$ref": "#/components/schemas/ChannelInfo"
+          },
+          "comments": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comments"
+          },
+          "definition": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Definition"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "dimension": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dimension"
+          },
+          "duration_sec": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Sec"
+          },
+          "engagement_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engagement Rate"
+          },
+          "first_trending_date": {
+            "format": "date",
+            "title": "First Trending Date",
+            "type": "string"
+          },
+          "last_trending_date": {
+            "format": "date",
+            "title": "Last Trending Date",
+            "type": "string"
+          },
+          "latest_country_code": {
+            "title": "Latest Country Code",
+            "type": "string"
+          },
+          "latest_trending_date": {
+            "format": "date",
+            "title": "Latest Trending Date",
+            "type": "string"
+          },
+          "licensed_content": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Licensed Content"
+          },
+          "likes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Likes"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "snapshot_count": {
+            "title": "Snapshot Count",
+            "type": "integer"
+          },
+          "tags": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tags"
+          },
+          "thumbnail_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thumbnail Url"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "trending_countries": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Trending Countries",
+            "type": "array"
+          },
+          "video_id": {
+            "title": "Video Id",
+            "type": "string"
+          },
+          "views": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Views"
+          }
+        },
+        "required": [
+          "video_id",
+          "title",
+          "description",
+          "tags",
+          "category",
+          "published_at",
+          "duration_sec",
+          "definition",
+          "dimension",
+          "licensed_content",
+          "thumbnail_url",
+          "views",
+          "likes",
+          "comments",
+          "engagement_rate",
+          "latest_country_code",
+          "latest_trending_date",
+          "first_trending_date",
+          "last_trending_date",
+          "trending_countries",
+          "snapshot_count",
+          "channel"
+        ],
+        "title": "VideoDetail",
+        "type": "object"
+      },
+      "VideoListItem": {
+        "description": "One video. Title, channel, category, counts and engagement come from its latest snapshot\nWITHIN THE FILTERED DATASET; the date/country fields aggregate its filtered snapshots.",
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "channel_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel Id"
+          },
+          "channel_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel Title"
+          },
+          "comments": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comments"
+          },
+          "days_on_trending": {
+            "description": "Distinct trending dates within the filters.",
+            "title": "Days On Trending",
+            "type": "integer"
+          },
+          "duration_sec": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Sec"
+          },
+          "engagement_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "(likes + comments) / views; null when views are 0.",
+            "title": "Engagement Rate"
+          },
+          "first_trending_date": {
+            "format": "date",
+            "title": "First Trending Date",
+            "type": "string"
+          },
+          "last_trending_date": {
+            "format": "date",
+            "title": "Last Trending Date",
+            "type": "string"
+          },
+          "likes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Likes"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "snapshot_count": {
+            "description": "Filtered snapshots (country x day appearances).",
+            "title": "Snapshot Count",
+            "type": "integer"
+          },
+          "thumbnail_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thumbnail Url"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "trending_countries": {
+            "description": "Countries with a filtered snapshot.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Trending Countries",
+            "type": "array"
+          },
+          "video_id": {
+            "title": "Video Id",
+            "type": "string"
+          },
+          "views": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Global lifetime view_count at the latest filtered snapshot.",
+            "title": "Views"
+          }
+        },
+        "required": [
+          "video_id",
+          "title",
+          "channel_id",
+          "channel_title",
+          "category",
+          "thumbnail_url",
+          "published_at",
+          "duration_sec",
+          "views",
+          "likes",
+          "comments",
+          "engagement_rate",
+          "trending_countries",
+          "days_on_trending",
+          "first_trending_date",
+          "last_trending_date",
+          "snapshot_count"
+        ],
+        "title": "VideoListItem",
+        "type": "object"
+      },
+      "VideoPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/VideoListItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "description": "Videos matching the filters and search.",
+            "title": "Total",
+            "type": "integer"
+          },
+          "total_pages": {
+            "title": "Total Pages",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total",
+          "total_pages"
+        ],
+        "title": "VideoPage",
+        "type": "object"
+      },
+      "VideoSort": {
+        "enum": [
+          "views",
+          "likes",
+          "comments",
+          "engagement_rate",
+          "days_on_trending",
+          "first_trending_date",
+          "last_trending_date",
+          "published_at"
+        ],
+        "title": "VideoSort",
+        "type": "string"
+      }
+    }
+  },
+  "info": {
+    "description": "\nRead-only analytics API over YouTube trending snapshots (PostgreSQL `app` schema) and a frozen ML model.\n\n**Metric semantics**\n* *Latest snapshot* = each video's latest snapshot **within the filtered dataset** (date range,\n  countries, categories), not its globally latest snapshot.\n* **Snapshot-level** metrics count trending appearances (country x video x day), e.g. trending volume.\n* **Video-level** metrics count each video once via its latest filtered snapshot, e.g. unique videos,\n  views, engagement rate.\n* **Country-level** metrics use each video's latest filtered snapshot in that country. Country\n  `views_of_trending_videos` are **global lifetime views** of videos that trended there; they are\n  **not additive** across countries.\n* View counts are lifetime totals: historical snapshots are **never summed** for views.\n* Period change: counts and views in **percent**; engagement rate in **percentage points**.\n\n**Authentication**: sign in via `/api/v1/auth/login` (or register). The session is an HttpOnly\ncookie; every `/api/v1` endpoint except register/login requires it. Analytics endpoints need\n`VIEW_ANALYTICS`, predictions `MAKE_PREDICTION`, member management `MANAGE_USERS`. The YouTube\ndataset is global and read-only; workspaces (tenants) own only their users and memberships.\nHealth probes are public.\n",
+    "title": "YouTube Trending Intelligence API",
+    "version": "1.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/analytics/categories": {
+      "get": {
+        "description": "Snapshot-level volume uses each snapshot's own category; video-level metrics use the category of each video's latest snapshot. 'Latest snapshot' means each video's latest snapshot WITHIN THE FILTERED DATASET (the rows matching the date range, countries and categories), not its globally latest snapshot.",
+        "operationId": "categories_api_v1_analytics_categories_get",
+        "parameters": [
+          {
+            "description": "First trending date (inclusive, YYYY-MM-DD). Default: 29 days before end_date, not earlier than the first date in the data.",
+            "in": "query",
+            "name": "start_date",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "First trending date (inclusive, YYYY-MM-DD). Default: 29 days before end_date, not earlier than the first date in the data.",
+              "title": "Start Date"
+            }
+          },
+          {
+            "description": "Last trending date (inclusive). Default: the latest trending date in the data.",
+            "in": "query",
+            "name": "end_date",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Last trending date (inclusive). Default: the latest trending date in the data.",
+              "title": "End Date"
+            }
+          },
+          {
+            "description": "Country code; repeat for several (?country=IN&country=US). Omit for all countries.",
+            "in": "query",
+            "name": "country",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Country code; repeat for several (?country=IN&country=US). Omit for all countries.",
+              "title": "Country"
+            }
+          },
+          {
+            "description": "Category (case-insensitive); repeat for several. Omit for all categories.",
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Category (case-insensitive); repeat for several. Omit for all categories.",
+              "title": "Category"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilteredResponse_list_CategoryPerformance__"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in or session expired."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Your role lacks the required permission."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request, filter or parameter."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unexpected server or database error."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database unavailable or busy."
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database statement timeout."
+          }
+        },
+        "summary": "Category performance",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/analytics/channels": {
+      "get": {
+        "description": "'Latest snapshot' means each video's latest snapshot WITHIN THE FILTERED DATASET (the rows matching the date range, countries and categories), not its globally latest snapshot.",
+        "operationId": "channels_api_v1_analytics_channels_get",
+        "parameters": [
+          {
+            "description": "Ranking metric (descending).",
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ChannelSort",
+              "default": "unique_videos",
+              "description": "Ranking metric (descending)."
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "First trending date (inclusive, YYYY-MM-DD). Default: 29 days before end_date, not earlier than the first date in the data.",
+            "in": "query",
+            "name": "start_date",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "First trending date (inclusive, YYYY-MM-DD). Default: 29 days before end_date, not earlier than the first date in the data.",
+              "title": "Start Date"
+            }
+          },
+          {
+            "description": "Last trending date (inclusive). Default: the latest trending date in the data.",
+            "in": "query",
+            "name": "end_date",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Last trending date (inclusive). Default: the latest trending date in the data.",
+              "title": "End Date"
+            }
+          },
+          {
+            "description": "Country code; repeat for several (?country=IN&country=US). Omit for all countries.",
+            "in": "query",
+            "name": "country",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Country code; repeat for several (?country=IN&country=US). Omit for all countries.",
+              "title": "Country"
+            }
+          },
+          {
+            "description": "Category (case-insensitive); repeat for several. Omit for all categories.",
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Category (case-insensitive); repeat for several. Omit for all categories.",
+              "title": "Category"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilteredResponse_list_ChannelPerformance__"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in or session expired."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Your role lacks the required permission."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request, filter or parameter."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unexpected server or database error."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database unavailable or busy."
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database statement timeout."
+          }
+        },
+        "summary": "Top channels",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/analytics/countries": {
+      "get": {
+        "description": "Country-level metrics use each video's latest filtered snapshot in that country. views_of_trending_videos are GLOBAL lifetime views of videos that trended in the country: not views from the country and not additive across countries.",
+        "operationId": "countries_api_v1_analytics_countries_get",
+        "parameters": [
+          {
+            "description": "First trending date (inclusive, YYYY-MM-DD). Default: 29 days before end_date, not earlier than the first date in the data.",
+            "in": "query",
+            "name": "start_date",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "First trending date (inclusive, YYYY-MM-DD). Default: 29 days before end_date, not earlier than the first date in the data.",
+              "title": "Start Date"
+            }
+          },
+          {
+            "description": "Last trending date (inclusive). Default: the latest trending date in the data.",
+            "in": "query",
+            "name": "end_date",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Last trending date (inclusive). Default: the latest trending date in the data.",
+              "title": "End Date"
+            }
+          },
+          {
+            "description": "Country code; repeat for several (?country=IN&country=US). Omit for all countries.",
+            "in": "query",
+            "name": "country",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Country code; repeat for several (?country=IN&country=US). Omit for all countries.",
+              "title": "Country"
+            }
+          },
+          {
+            "description": "Category (case-insensitive); repeat for several. Omit for all categories.",
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Category (case-insensitive); repeat for several. Omit for all categories.",
+              "title": "Category"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilteredResponse_list_CountryPerformance__"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in or session expired."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Your role lacks the required permission."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request, filter or parameter."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unexpected server or database error."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database unavailable or busy."
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database statement timeout."
+          }
+        },
+        "summary": "Country performance",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/analytics/engagement": {
+      "get": {
+        "description": "'Latest snapshot' means each video's latest snapshot WITHIN THE FILTERED DATASET (the rows matching the date range, countries and categories), not its globally latest snapshot.",
+        "operationId": "engagement_api_v1_analytics_engagement_get",
+        "parameters": [
+          {
+            "description": "Top videos by views in the scatter.",
+            "in": "query",
+            "name": "scatter_limit",
+            "required": false,
+            "schema": {
+              "default": 200,
+              "description": "Top videos by views in the scatter.",
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Scatter Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "First trending date (inclusive, YYYY-MM-DD). Default: 29 days before end_date, not earlier than the first date in the data.",
+            "in": "query",
+            "name": "start_date",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "First trending date (inclusive, YYYY-MM-DD). Default: 29 days before end_date, not earlier than the first date in the data.",
+              "title": "Start Date"
+            }
+          },
+          {
+            "description": "Last trending date (inclusive). Default: the latest trending date in the data.",
+            "in": "query",
+            "name": "end_date",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Last trending date (inclusive). Default: the latest trending date in the data.",
+              "title": "End Date"
+            }
+          },
+          {
+            "description": "Country code; repeat for several (?country=IN&country=US). Omit for all countries.",
+            "in": "query",
+            "name": "country",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Country code; repeat for several (?country=IN&country=US). Omit for all countries.",
+              "title": "Country"
+            }
+          },
+          {
+            "description": "Category (case-insensitive); repeat for several. Omit for all categories.",
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Category (case-insensitive); repeat for several. Omit for all categories.",
+              "title": "Category"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilteredResponse_EngagementAnalysis_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in or session expired."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Your role lacks the required permission."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request, filter or parameter."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unexpected server or database error."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database unavailable or busy."
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database statement timeout."
+          }
+        },
+        "summary": "Engagement totals, distribution, histogram, by-category spread and top-views scatter",
+        "tags": [
+          "analytics"
+        ]
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "operationId": "login_api_v1_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_CurrentUser_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid email or password."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request."
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Account temporarily locked."
+          }
+        },
+        "summary": "Sign in with email and password",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "operationId": "logout_api_v1_auth_logout_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_LogoutResult_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request."
+          }
+        },
+        "summary": "Sign out: revoke the current session and clear the cookie (idempotent)",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "operationId": "me_api_v1_auth_me_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_CurrentUser_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in or session expired."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request."
+          }
+        },
+        "summary": "The signed-in user, role and workspace",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "operationId": "register_api_v1_auth_register_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_CurrentUser_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Registration is disabled."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Email already registered."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request."
+          }
+        },
+        "summary": "Create an account and a new workspace (you become its OWNER) and sign in",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/meta/filters": {
+      "get": {
+        "description": "All values come from PostgreSQL (app.trending_snapshots); nothing is hardcoded and the\ndate boundaries come from the data, not today's date.",
+        "operationId": "filter_options_api_v1_meta_filters_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_FilterOptions_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in or session expired."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Your role lacks the required permission."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request, filter or parameter."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unexpected server or database error."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database unavailable or busy."
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database statement timeout."
+          }
+        },
+        "summary": "Available countries, categories, date range and the default window",
+        "tags": [
+          "metadata"
+        ]
+      }
+    },
+    "/api/v1/overview/daily-volume": {
+      "get": {
+        "operationId": "daily_volume_api_v1_overview_daily_volume_get",
+        "parameters": [
+          {
+            "description": "Split into one series per country or per (snapshot) category.",
+            "in": "query",
+            "name": "split_by",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/DailySplit"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Split into one series per country or per (snapshot) category.",
+              "title": "Split By"
+            }
+          },
+          {
+            "description": "First trending date (inclusive, YYYY-MM-DD). Default: 29 days before end_date, not earlier than the first date in the data.",
+            "in": "query",
+            "name": "start_date",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "First trending date (inclusive, YYYY-MM-DD). Default: 29 days before end_date, not earlier than the first date in the data.",
+              "title": "Start Date"
+            }
+          },
+          {
+            "description": "Last trending date (inclusive). Default: the latest trending date in the data.",
+            "in": "query",
+            "name": "end_date",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Last trending date (inclusive). Default: the latest trending date in the data.",
+              "title": "End Date"
+            }
+          },
+          {
+            "description": "Country code; repeat for several (?country=IN&country=US). Omit for all countries.",
+            "in": "query",
+            "name": "country",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Country code; repeat for several (?country=IN&country=US). Omit for all countries.",
+              "title": "Country"
+            }
+          },
+          {
+            "description": "Category (case-insensitive); repeat for several. Omit for all categories.",
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Category (case-insensitive); repeat for several. Omit for all categories.",
+              "title": "Category"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilteredResponse_DailyVolume_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in or session expired."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Your role lacks the required permission."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request, filter or parameter."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unexpected server or database error."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database unavailable or busy."
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database statement timeout."
+          }
+        },
+        "summary": "Daily trending volume and unique videos (zero-filled)",
+        "tags": [
+          "overview"
+        ]
+      }
+    },
+    "/api/v1/overview/kpis": {
+      "get": {
+        "description": "'Latest snapshot' means each video's latest snapshot WITHIN THE FILTERED DATASET (the rows matching the date range, countries and categories), not its globally latest snapshot. Counts and views change in percent; engagement_rate changes in percentage points. The previous period is the immediately preceding period of equal length with the same countries and categories.",
+        "operationId": "kpis_api_v1_overview_kpis_get",
+        "parameters": [
+          {
+            "description": "First trending date (inclusive, YYYY-MM-DD). Default: 29 days before end_date, not earlier than the first date in the data.",
+            "in": "query",
+            "name": "start_date",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "First trending date (inclusive, YYYY-MM-DD). Default: 29 days before end_date, not earlier than the first date in the data.",
+              "title": "Start Date"
+            }
+          },
+          {
+            "description": "Last trending date (inclusive). Default: the latest trending date in the data.",
+            "in": "query",
+            "name": "end_date",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Last trending date (inclusive). Default: the latest trending date in the data.",
+              "title": "End Date"
+            }
+          },
+          {
+            "description": "Country code; repeat for several (?country=IN&country=US). Omit for all countries.",
+            "in": "query",
+            "name": "country",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Country code; repeat for several (?country=IN&country=US). Omit for all countries.",
+              "title": "Country"
+            }
+          },
+          {
+            "description": "Category (case-insensitive); repeat for several. Omit for all categories.",
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Category (case-insensitive); repeat for several. Omit for all categories.",
+              "title": "Category"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilteredResponse_Kpis_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in or session expired."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Your role lacks the required permission."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request, filter or parameter."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unexpected server or database error."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database unavailable or busy."
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database statement timeout."
+          }
+        },
+        "summary": "Overview KPIs with period-over-period change",
+        "tags": [
+          "overview"
+        ]
+      }
+    },
+    "/api/v1/predictions": {
+      "post": {
+        "description": "Returns high_performance_probability: the model's score that a video which is ALREADY TRENDING performs at or above its country's thresholds for views, likes and comments. It is not the probability that an arbitrary video will become trending. Nothing is stored.",
+        "operationId": "predict_api_v1_predictions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PredictionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_Prediction_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in or session expired."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Your role lacks the required permission."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid or unsupported prediction input."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The prediction model is disabled or failed to load."
+          }
+        },
+        "summary": "Score a video's high-performance likelihood",
+        "tags": [
+          "predictions"
+        ]
+      }
+    },
+    "/api/v1/predictions/model-info": {
+      "get": {
+        "operationId": "model_info_api_v1_predictions_model_info_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_ModelInfo_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in or session expired."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Your role lacks the required permission."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid or unsupported prediction input."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "The prediction model is disabled or failed to load."
+          }
+        },
+        "summary": "What the model predicts, supported inputs and limitations",
+        "tags": [
+          "predictions"
+        ]
+      }
+    },
+    "/api/v1/tenant": {
+      "get": {
+        "operationId": "get_tenant_api_v1_tenant_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_TenantDetail_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in or session expired."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing permission or role rule violated."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request."
+          }
+        },
+        "summary": "Your workspace",
+        "tags": [
+          "tenant"
+        ]
+      }
+    },
+    "/api/v1/tenant/members": {
+      "get": {
+        "operationId": "list_members_api_v1_tenant_members_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_list_Member__"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in or session expired."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing permission or role rule violated."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request."
+          }
+        },
+        "summary": "Members of your workspace (MANAGE_USERS)",
+        "tags": [
+          "tenant"
+        ]
+      },
+      "post": {
+        "operationId": "create_member_api_v1_tenant_members_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_Member_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in or session expired."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing permission or role rule violated."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Email already registered."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request."
+          }
+        },
+        "summary": "Add a user to your workspace with an initial password (MANAGE_USERS)",
+        "tags": [
+          "tenant"
+        ]
+      }
+    },
+    "/api/v1/tenant/members/{user_id}": {
+      "patch": {
+        "operationId": "update_member_api_v1_tenant_members__user_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMemberRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_Member_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in or session expired."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Missing permission or role rule violated."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "No such member in your workspace."
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Would leave no active owner."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request."
+          }
+        },
+        "summary": "Change a member's role or active status (MANAGE_USERS)",
+        "tags": [
+          "tenant"
+        ]
+      }
+    },
+    "/api/v1/videos": {
+      "get": {
+        "description": "'Latest snapshot' means each video's latest snapshot WITHIN THE FILTERED DATASET (the rows matching the date range, countries and categories), not its globally latest snapshot. Ordering is deterministic: NULLs last, ties broken by video_id.",
+        "operationId": "list_videos_api_v1_videos_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/VideoSort",
+              "default": "views"
+            }
+          },
+          {
+            "in": "query",
+            "name": "order",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/SortOrder",
+              "default": "desc"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "maximum": 1000000,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Case-insensitive substring of the title or channel title, or an exact video_id; 2-100 characters; wildcards are matched literally.",
+            "in": "query",
+            "name": "search",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Case-insensitive substring of the title or channel title, or an exact video_id; 2-100 characters; wildcards are matched literally.",
+              "title": "Search"
+            }
+          },
+          {
+            "description": "First trending date (inclusive, YYYY-MM-DD). Default: 29 days before end_date, not earlier than the first date in the data.",
+            "in": "query",
+            "name": "start_date",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "First trending date (inclusive, YYYY-MM-DD). Default: 29 days before end_date, not earlier than the first date in the data.",
+              "title": "Start Date"
+            }
+          },
+          {
+            "description": "Last trending date (inclusive). Default: the latest trending date in the data.",
+            "in": "query",
+            "name": "end_date",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Last trending date (inclusive). Default: the latest trending date in the data.",
+              "title": "End Date"
+            }
+          },
+          {
+            "description": "Country code; repeat for several (?country=IN&country=US). Omit for all countries.",
+            "in": "query",
+            "name": "country",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Country code; repeat for several (?country=IN&country=US). Omit for all countries.",
+              "title": "Country"
+            }
+          },
+          {
+            "description": "Category (case-insensitive); repeat for several. Omit for all categories.",
+            "in": "query",
+            "name": "category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Category (case-insensitive); repeat for several. Omit for all categories.",
+              "title": "Category"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilteredResponse_VideoPage_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in or session expired."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Your role lacks the required permission."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request, filter or parameter."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unexpected server or database error."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database unavailable or busy."
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database statement timeout."
+          }
+        },
+        "summary": "Paginated list of trending videos",
+        "tags": [
+          "videos"
+        ]
+      }
+    },
+    "/api/v1/videos/{video_id}": {
+      "get": {
+        "operationId": "video_detail_api_v1_videos__video_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "video_id",
+            "required": true,
+            "schema": {
+              "maxLength": 64,
+              "minLength": 1,
+              "title": "Video Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_VideoDetail_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in or session expired."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Your role lacks the required permission."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unknown video_id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request, filter or parameter."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unexpected server or database error."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database unavailable or busy."
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database statement timeout."
+          }
+        },
+        "summary": "Video detail (globally latest snapshot; not filtered)",
+        "tags": [
+          "videos"
+        ]
+      }
+    },
+    "/api/v1/videos/{video_id}/history": {
+      "get": {
+        "operationId": "video_history_api_v1_videos__video_id__history_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "video_id",
+            "required": true,
+            "schema": {
+              "maxLength": 64,
+              "minLength": 1,
+              "title": "Video Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataResponse_list_HistoryPoint__"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not signed in or session expired."
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Your role lacks the required permission."
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unknown video_id."
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Invalid request, filter or parameter."
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unexpected server or database error."
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database unavailable or busy."
+          },
+          "504": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Database statement timeout."
+          }
+        },
+        "summary": "Full trending history (all countries and dates; not filtered)",
+        "tags": [
+          "videos"
+        ]
+      }
+    },
+    "/health/live": {
+      "get": {
+        "operationId": "live_health_live_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Liveness: the process is up (no database access)",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "description": "Ready when the database answers as a read-only session and both application views are\nreadable. ML status is reported separately and does not affect readiness.",
+        "operationId": "ready_health_ready_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "503": {
+            "description": "Not ready (database unavailable or check failed)."
+          }
+        },
+        "summary": "Readiness: database connectivity, read access and read-only session",
+        "tags": [
+          "health"
+        ]
+      }
+    }
+  }
+}

@@ -1,20 +1,34 @@
+import os
+import sys
 import pandas as pd
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
+from sqlalchemy.engine import URL
 from googleapiclient.discovery import build
 from datetime import datetime
 import isodate
 
 # ------------------------------------------------
-# 1. CONFIG
+# 1. CONFIG (read from environment / .env)
 # ------------------------------------------------
-API_KEY = "YOUR_YOUTUBE_API_KEY"
-DB_USER = "postgres"
-DB_PASSWORD = quote_plus("hsk@2006")  
-DB_HOST = "localhost"
-DB_PORT = "5432"
-DB_NAME = "youtube"
+load_dotenv()
+
+missing = [v for v in ("YOUTUBE_API_KEY", "DB_NAME", "DB_PASSWORD") if not os.getenv(v)]
+if missing:
+    sys.exit(f"Missing required environment variables: {', '.join(missing)}. See .env.example.")
+
+API_KEY = os.environ["YOUTUBE_API_KEY"]
+
+# URL.create escapes special characters in the password
 engine = create_engine(
-    f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    URL.create(
+        "postgresql+psycopg2",
+        username=os.getenv("DB_USER", "postgres"),
+        password=os.environ["DB_PASSWORD"],
+        host=os.getenv("DB_HOST", "localhost"),
+        port=int(os.getenv("DB_PORT", "5432")),
+        database=os.environ["DB_NAME"],
+    )
 )
 
 youtube = build("youtube", "v3", developerKey=API_KEY)
