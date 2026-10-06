@@ -2,7 +2,7 @@
 
 /*
  * Design-token foundation (Phase 3.1).
- * Neutral slate/white surfaces, one controlled accent (blue), Inter with tabular numbers.
+ * Neutral slate/white surfaces, one controlled accent (YouTube red), Inter with tabular numbers.
  * Component-level tokens (charts, status colours) are added with the design system in Phase 3.3.
  */
 @theme {
@@ -10,14 +10,14 @@
     'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Accent = Tailwind blue; referenced by name so the accent can be swapped in one place. */
+/* Accent = Tailwind red (YouTube-style theme); referenced by name so the accent can be swapped in one place. */
 @theme inline {
-  --color-accent-50: var(--color-blue-50);
-  --color-accent-100: var(--color-blue-100);
-  --color-accent-200: var(--color-blue-200);
-  --color-accent-500: var(--color-blue-500);
-  --color-accent-600: var(--color-blue-600);
-  --color-accent-700: var(--color-blue-700);
+  --color-accent-50: var(--color-red-50);
+  --color-accent-100: var(--color-red-100);
+  --color-accent-200: var(--color-red-200);
+  --color-accent-500: var(--color-red-500);
+  --color-accent-600: var(--color-red-600);
+  --color-accent-700: var(--color-red-700);
 }
 
 @layer base {

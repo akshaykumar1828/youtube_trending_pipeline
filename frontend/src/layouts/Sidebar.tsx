@@ -6,6 +6,7 @@ import { hasPermission } from '../features/auth/permissions';
 import { useCurrentUser } from '../features/auth/queries';
 import { useGlobalFilters } from '../features/filters/useGlobalFilters';
 import { cn } from '../lib/cn';
+import { Logo } from './Logo';
 
 /** Items are shown only with their permission (UX only: the API enforces the same rules). */
 const NAV_ITEMS: {
@@ -25,11 +26,9 @@ const NAV_ITEMS: {
 export function Brand() {
   return (
     <div className="flex items-center gap-2.5">
-      <span aria-hidden="true" className="grid size-7 place-items-center rounded-md bg-accent-600">
-        <BarChart3 className="size-4 text-white" />
-      </span>
-      <span className="text-sm leading-tight font-semibold text-slate-900">
-        Trending
+      <Logo />
+      <span className="text-sm leading-tight font-bold tracking-tight text-slate-900">
+        YouTube Trending
         <span className="block text-xs font-normal text-slate-500">Intelligence</span>
       </span>
     </div>
@@ -55,10 +54,11 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
             onClick={onNavigate}
             className={({ isActive }) =>
               cn(
-                'flex h-9 items-center gap-2.5 rounded-md border-l-2 px-2.5 text-sm font-medium transition-colors',
+                // YouTube-style: grey rounded highlight, bold label, red icon for the current page
+                'flex h-10 items-center gap-3 rounded-lg px-3 text-sm transition-colors',
                 isActive
-                  ? 'border-accent-600 bg-accent-50 text-accent-700'
-                  : 'border-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+                  ? 'bg-slate-100 font-semibold text-slate-900 [&>svg]:text-accent-600'
+                  : 'font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900',
               )
             }
           >

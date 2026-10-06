@@ -1,18 +1,18 @@
 /** Shared Recharts styling: one accent colour, muted series palette, quiet axes and grid. */
 
-export const ACCENT = '#2563eb'; // blue-600 (matches --color-accent-600)
+export const ACCENT = '#dc2626'; // red-600 (matches --color-accent-600)
 export const SECONDARY = '#94a3b8'; // slate-400
 
 /** Used only where several series must be distinguished (e.g. countries). */
 export const SERIES_COLORS = [
-  '#2563eb',
+  '#dc2626',
   '#0d9488',
   '#d97706',
   '#7c3aed',
   '#db2777',
   '#0891b2',
   '#65a30d',
-  '#dc2626',
+  '#2563eb',
   '#475569',
 ] as const;
 
