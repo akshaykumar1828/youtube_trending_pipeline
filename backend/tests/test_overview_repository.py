@@ -78,7 +78,7 @@ def test_unfiltered_latest_equals_app_video_details(conn, all_time):
                                   AND d.view_count IS NOT DISTINCT FROM l.view_count) AS matching
         FROM latest l JOIN app.video_details d ON d.video_id = l.video_id
     """), params).one()
-    assert row.n == row.matching == 99402
+    assert row.n == row.matching == 217115
 
 
 def test_latest_is_within_filtered_dataset_not_global(conn):
@@ -112,7 +112,7 @@ def test_kpis_default_window_match_independent_sql(conn, w30):
 def test_previous_period_matches_independent_sql(conn, w30):
     kpis = overview.get_kpis(conn, w30)
     prev = kpis["previous_period"]
-    assert (prev["start_date"], prev["end_date"], prev["available"]) == (date(2025, 11, 7), date(2025, 12, 6), True)
+    assert (prev["start_date"], prev["end_date"], prev["available"]) == (date(2026, 8, 7), date(2026, 9, 5), True)
     assert_kpis_match(kpis, independent_kpis(conn, prev["start_date"], prev["end_date"]), key="previous")
 
 
@@ -136,7 +136,7 @@ def test_change_helpers():
 def test_country_filtered_kpis(conn, w30):
     f = replace(w30, countries=("IN",))
     kpis = overview.get_kpis(conn, f)
-    assert kpis["trending_volume"]["value"] == 5988
+    assert kpis["trending_volume"]["value"] == 5870
     assert_kpis_match(kpis, independent_kpis(conn, W30_START, MAX_DATE, countries=["IN"]))
 
 
@@ -160,8 +160,8 @@ def test_all_time_kpis_equal_global_totals(conn, all_time):
         "SELECT count(*) AS n, sum(view_count) AS v, sum(like_count) AS l, sum(comment_count) AS c "
         "FROM app.video_details")).one()
     channels = conn.execute(text("SELECT count(DISTINCT channel_id) FROM app.trending_snapshots")).scalar_one()
-    assert kpis["trending_volume"]["value"] == 658761
-    assert kpis["unique_videos"]["value"] == totals.n == 99402
+    assert kpis["trending_volume"]["value"] == 1135886
+    assert kpis["unique_videos"]["value"] == totals.n == 217115
     assert kpis["views"]["value"] == int(totals.v)
     assert kpis["unique_channels"]["value"] == channels
     assert math.isclose(kpis["engagement_rate"]["value"], (int(totals.l) + int(totals.c)) / int(totals.v), rel_tol=1e-12)
@@ -205,22 +205,23 @@ def test_daily_volume_zero_filled_and_matches_independent_sql(conn, w30):
 
 def test_daily_volume_zero_fill_for_sparse_category(conn, all_time):
     points = overview.get_daily_volume(conn, replace(all_time, categories=("Nonprofits & Activism",)))["series"][0]["points"]
-    assert len(points) == (MAX_DATE - MIN_DATE).days + 1 == 451  # every calendar day
-    assert sum(p["trending_volume"] for p in points) == 12
+    assert len(points) == (MAX_DATE - MIN_DATE).days + 1 == 724  # every calendar day
+    assert sum(p["trending_volume"] for p in points) == 13
     active_days = conn.execute(text(
         "SELECT count(DISTINCT trending_date) FROM app.trending_snapshots WHERE category = 'Nonprofits & Activism'"
     )).scalar_one()
-    assert sum(1 for p in points if p["trending_volume"] == 0) == 451 - active_days
+    assert sum(1 for p in points if p["trending_volume"] == 0) == 724 - active_days
 
 
 def test_daily_volume_includes_dates_missing_from_data(conn, all_time):
-    """3 calendar days have no snapshots in any country (448 distinct dates over 451 days);
+    """8 calendar days have no snapshots in any country (716 distinct dates over 724 days);
     they appear as explicit zeros, not gaps."""
     points = {p["date"]: p for p in overview.get_daily_volume(conn, all_time)["series"][0]["points"]}
-    assert len(points) == 451
-    for missing in (date(2024, 10, 24), date(2025, 4, 18), date(2025, 10, 14)):
+    assert len(points) == 724
+    for missing in (date(2024, 10, 24), date(2025, 4, 18), date(2025, 10, 14), date(2026, 6, 10), date(2026, 6, 11),
+                    date(2026, 6, 12), date(2026, 6, 26), date(2026, 8, 10)):
         assert points[missing]["trending_volume"] == points[missing]["unique_videos"] == 0
-    assert sum(1 for p in points.values() if p["trending_volume"] > 0) == 448
+    assert sum(1 for p in points.values() if p["trending_volume"] > 0) == 716
 
 
 def test_daily_split_by_country_sums_to_unsplit(conn, w30):

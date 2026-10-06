@@ -73,7 +73,25 @@ def test_model_loads(predictor):
     assert predictor.embedder.get_embedding_dimension() == 768
     assert predictor.pca.n_components_ == 32
     assert predictor.gbm.n_features_in_ == len(predictor.columns)
-    assert predictor.trained_until == "2025-12-02"
+    assert predictor.trained_until == "2026-07-19"
+
+
+def test_second_model_has_no_channel_numbers(predictor):
+    assert predictor.gbm_no_channel.n_features_in_ == len(predictor.columns_no_channel)
+    assert set(predictor.columns) - set(predictor.columns_no_channel) == set(features.CHANNEL_NUMBER_FEATURES)
+    assert predictor.blend_weight == 0.5
+
+
+def test_blend_halves_the_channel_models_swing():
+    """With weight 0.5 the final logit is the average of the two models' logits: since the
+    second model never sees channel numbers, a wrong channel input moves the final logit by
+    exactly half of what it moves the channel model's logit."""
+    z = lambda p: float(features.logit(p)[0])
+    p_full, p_wrong, p_no_channel = 0.80, 0.20, 0.60
+    good = features.blend([p_full], [p_no_channel], 0.5)
+    wrong = features.blend([p_wrong], [p_no_channel], 0.5)
+    assert z(good) == pytest.approx((z([p_full]) + z([p_no_channel])) / 2)
+    assert z(good) - z(wrong) == pytest.approx((z([p_full]) - z([p_wrong])) / 2)
 
 
 def test_feature_table_matches_model_columns(predictor):

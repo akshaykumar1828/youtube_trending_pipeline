@@ -104,7 +104,12 @@ added. (Earlier CSV exports of the data are no longer part of the repository; th
 git history.)
 
 In the database this repository was developed against, the data covers 2024-10-12 to
-2026-01-05: 658,761 snapshots of 99,402 distinct videos.
+2026-10-05: 1,135,886 snapshots of 217,115 distinct videos. Days after 2026-01-05 were
+appended from the public Kaggle dataset "YouTube Trending Videos Dataset - Daily Update"
+(canerkonuk/youtube-trending-videos-global, CC0), which comes from the same YouTube API
+collection (all 64,462 overlapping rows match), with
+`pushing_into_database/import_kaggle_trending.py`; it only adds days newer than each table's
+latest date and never changes existing rows.
 
 ## How to read the numbers
 
@@ -160,7 +165,7 @@ Education, Entertainment, Film & Animation, Gaming, Howto & Style, Music, News &
 Nonprofits & Activism, People & Blogs, Pets & Animals, Science & Technology, Sports, Travel &
 Events). Anything else is rejected with a clear validation error.
 
-**How it works (model v3).** One gradient-boosting model looks at all inputs together:
+**How it works (model v3).** Two gradient-boosting models look at the inputs together:
 
 - **Text**: LaBSE (`sentence-transformers/LaBSE`, multilingual) embeds channel name, title,
   description and tags; a logistic regression turns the embedding into a *text score*
@@ -171,13 +176,22 @@ Events). Anything else is rejected with a clear validation error.
 - **Title/description/tag signals**: keywords, digits, `?` and `!`, lengths, capitals, emoji,
   hashtags, links, tag count.
 
-**How good it is.** On the newest period of data, never used for training (Dec 2025 – Jan
-2026), it reaches ROC-AUC **0.923**; the previous model scored 0.842 on the same rows. On a
-live check with 397 videos taken straight from YouTube's trending lists, it reached 0.891
-(previous model 0.832). Details, per-country results and the full history are in
+One model uses all of these; the other uses everything **except the channel numbers**
+(subscribers, channel views, video count). The result is their 50/50 blend (an average of
+log-odds), so channel size cannot outweigh the content: a wrong channel number moves a
+prediction about half as much as it would with the channel model alone. This costs very
+little accuracy (validation ROC-AUC 0.901 vs 0.905).
+
+**How good it is.** Trained on 2024-10-12 – 2026-07-19. On the newest period, never used
+for training or model choice (2026-07-20 – 2026-10-05, 60,616 video-country rows), it reaches
+ROC-AUC **0.902**; the previous app model (trained to 2025-12-02) scores 0.868 on the same rows.
+On a live check with 398 videos taken straight from YouTube's trending lists on 2026-10-06,
+it reached 0.851 (previous app model 0.849 on the same videos), while entering wrong channel
+numbers (views ÷1000, subscribers ×10) moved its predictions 7.5 points on average versus 15.3
+for the previous model. Details, per-country results and the full history are in
 [ml_training/REPORT.md](ml_training/REPORT.md).
 
-**Where it lives.** `model/trending_model_v3.joblib` (one file, checksum-verified by the tests
+**Where it lives.** `model/trending_model_v3.joblib` (one file holding both models, checksum-verified by the tests
 and the Docker build), inference code in `ml/`, training code in `ml_training/`. The feature
 code in `ml/features.py` is shared by training and serving, and the tests check that the app
 reproduces 25 reference predictions of the training pipeline. `scikit-learn` is pinned to
@@ -308,7 +322,7 @@ The backend tests run against the real development database (with migrations app
 and some assert values from the current dataset; the ML tests load the real model.
 `deploy/smoke_test.py` checks a running Docker stack over HTTP.
 
-At the time of writing: 347 backend tests, 71 ML tests and 169 frontend tests pass.
+At the time of writing: 347 backend tests, 73 ML tests and 169 frontend tests pass.
 
 ## Repository layout
 

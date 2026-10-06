@@ -88,6 +88,6 @@ def test_all_time_completes_under_statement_timeout(conn, all_time, name, fn):
 
 
 def test_all_time_list_videos_totals(conn, all_time):
-    assert videos.list_videos(conn, all_time)["total"] == 99402
-    last = videos.list_videos(conn, all_time, page=3977)
-    assert len(last["items"]) == 99402 - 3976 * 25
+    assert videos.list_videos(conn, all_time)["total"] == 217115
+    last = videos.list_videos(conn, all_time, page=8685)
+    assert len(last["items"]) == 217115 - 8684 * 25

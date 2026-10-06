@@ -1,8 +1,9 @@
 """Inference for the YouTube trending model (v3).
 
-One gradient-boosting model scores a video in a given country from channel statistics,
-duration, category, country, title/description/tag signals and the text (LaBSE embedding:
-a logistic-regression text score plus 32 PCA components). Training code and evaluation:
+Two gradient-boosting models score a video in a given country from duration, category,
+country, title/description/tag signals and the text (LaBSE embedding: a logistic-regression
+text score plus 32 PCA components); one of them also uses the channel statistics. The final
+probability blends the two (features.blend), so channel numbers cannot dominate. Training code and evaluation:
 ml_training/ (see ml_training/REPORT.md). The artifact is only read, never re-saved.
 """
 
@@ -35,6 +36,9 @@ class TrendingPredictor:
         self.gbm = model["gbm"]
         self.vpv_clip, self.spv_clip = model["clips"]
         self.columns = model["columns"]
+        self.gbm_no_channel = model["gbm_no_channel"]
+        self.columns_no_channel = model["columns_no_channel"]
+        self.blend_weight = model["blend_weight"]
         self.categories = model["categories"]
         self.trained_until = model["trained_until"]
 
@@ -63,7 +67,9 @@ class TrendingPredictor:
                                      self.pca.transform(embedding))
         for column, cats in self.categories.items():
             table[column] = pd.Categorical(table[column].astype(str), categories=cats)
-        probability = self.gbm.predict_proba(table[self.columns])[:, 1][0]
+        probability = features.blend(self.gbm.predict_proba(table[self.columns])[:, 1],
+                                     self.gbm_no_channel.predict_proba(table[self.columns_no_channel])[:, 1],
+                                     self.blend_weight)[0]
 
         return PredictionResult(
             final_probability=float(probability),

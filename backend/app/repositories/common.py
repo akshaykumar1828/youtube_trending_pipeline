@@ -17,7 +17,7 @@ country codes are ASCII, so grouping and ordering results are unchanged.
 
 HOW IT IS COMPUTED (performance; identical results)
 ---------------------------------------------------
-Sorting every filtered snapshot (up to 658,761 rows) spills to disk under the
+Sorting every filtered snapshot (up to 1,135,886 rows) spills to disk under the
 server's 4 MB work_mem. Instead, rule 1 is applied with a hash aggregate
 (max(trending_date) per video, no sort), the filtered rows on that date are
 joined back (the latest date plus any same-day ties in other countries), and

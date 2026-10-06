@@ -143,7 +143,7 @@ def test_engagement_by_category_matches_numpy(conn, w30, latest_counts):
 
 def test_engagement_scatter_is_top_videos_by_views(conn, w30, latest_counts):
     scatter = analytics.get_engagement_analysis(conn, w30, scatter_limit=50)["scatter"]
-    expected = sorted(latest_counts, key=lambda r: (-r.view_count, r.video_id))[:50]
+    expected = sorted(latest_counts, key=lambda r: (r.view_count is None, -(r.view_count or 0), r.video_id))[:50]  # NULLS LAST
     assert [s["video_id"] for s in scatter] == [r.video_id for r in expected]
 
 

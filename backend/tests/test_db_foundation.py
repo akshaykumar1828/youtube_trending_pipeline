@@ -55,11 +55,11 @@ def test_connects_as_read_only_role(conn):
 
 
 def test_reads_trending_snapshots(conn):
-    assert conn.execute(text("SELECT count(*) FROM app.trending_snapshots")).scalar_one() == 658761
+    assert conn.execute(text("SELECT count(*) FROM app.trending_snapshots")).scalar_one() == 1135886
 
 
 def test_reads_video_details(conn):
-    assert conn.execute(text("SELECT count(*) FROM app.video_details")).scalar_one() == 99402
+    assert conn.execute(text("SELECT count(*) FROM app.video_details")).scalar_one() == 217115
 
 
 @pytest.mark.parametrize("relation", [
@@ -147,8 +147,8 @@ def test_get_countries(conn):
 
 def test_get_min_and_max_date(conn):
     assert meta.get_min_date(conn) == date(2024, 10, 12)
-    assert meta.get_max_date(conn) == date(2026, 1, 5)
-    assert meta.get_date_range(conn) == (date(2024, 10, 12), date(2026, 1, 5))
+    assert meta.get_max_date(conn) == date(2026, 10, 5)
+    assert meta.get_date_range(conn) == (date(2024, 10, 12), date(2026, 10, 5))
 
 
 def test_get_categories_from_database(conn):
@@ -157,7 +157,7 @@ def test_get_categories_from_database(conn):
         "SELECT category FROM app.trending_snapshots GROUP BY category ORDER BY category"
     )).scalars())
     assert categories == independent
-    assert len(categories) == 16
+    assert len(categories) == 17
     assert "Unknown" in categories and "Gaming" in categories
 
 
@@ -175,7 +175,7 @@ def test_no_hardcoded_categories_or_countries(conn):
 # ---------------------------------------------------
 def test_default_filters_are_30_days_ending_at_max_date(conn):
     f = build_filters(conn)
-    assert (f.start_date, f.end_date, f.days) == (date(2025, 12, 7), date(2026, 1, 5), 30)
+    assert (f.start_date, f.end_date, f.days) == (date(2026, 9, 6), date(2026, 10, 5), 30)
     assert f.countries == () and f.categories == ()
 
 
@@ -186,7 +186,7 @@ def test_default_start_never_before_min_date(conn):
 
 def test_previous_period_is_immediately_preceding_equal_length(conn):
     f = build_filters(conn)
-    assert f.previous_period() == (date(2025, 11, 7), date(2025, 12, 6))
+    assert f.previous_period() == (date(2026, 8, 7), date(2026, 9, 5))
     g = build_filters(conn, start_date=date(2025, 1, 10), end_date=date(2025, 1, 16))
     assert g.previous_period() == (date(2025, 1, 3), date(2025, 1, 9))
 
@@ -194,7 +194,7 @@ def test_previous_period_is_immediately_preceding_equal_length(conn):
 @pytest.mark.parametrize("kwargs, field", [
     ({"start_date": date(2025, 6, 2), "end_date": date(2025, 6, 1)}, "start_date"),
     ({"start_date": date(2024, 10, 11)}, "start_date"),
-    ({"end_date": date(2026, 1, 6)}, "end_date"),
+    ({"end_date": date(2026, 10, 6)}, "end_date"),
     ({"end_date": "2026-01-05"}, "end_date"),
 ])
 def test_invalid_dates_rejected(conn, kwargs, field):
@@ -231,7 +231,7 @@ def test_sql_conditions_use_only_bound_parameters(conn):
     sql, params = f.sql_conditions()
     assert sql == ("trending_date BETWEEN :start_date AND :end_date"
                    " AND country_code = ANY(:countries) AND category = ANY(:categories)")
-    assert params == {"start_date": date(2025, 12, 7), "end_date": date(2026, 1, 5),
+    assert params == {"start_date": date(2026, 9, 6), "end_date": date(2026, 10, 5),
                       "countries": ["IN"], "categories": ["Music"]}
     assert "IN" not in sql.replace("BETWEEN", "") and "Music" not in sql
 
@@ -239,7 +239,7 @@ def test_sql_conditions_use_only_bound_parameters(conn):
 def test_filtered_query_executes_with_expected_result(conn):
     sql, params = build_filters(conn, countries=["in"]).sql_conditions()
     volume = conn.execute(text(f"SELECT count(*) FROM app.trending_snapshots WHERE {sql}"), params).scalar_one()
-    assert volume == 5988  # IN, 2025-12-07..2026-01-05 (matches the Phase 2b benchmark)
+    assert volume == 5870  # IN, 2026-09-06..2026-10-05 (independent SQL count)
 
 
 def test_filters_dataclass_is_immutable():

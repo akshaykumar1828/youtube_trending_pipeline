@@ -10,6 +10,9 @@ India median views) AND likes >= country median AND comments >= country median, 
 are taken over all first appearances IN THAT COUNTRY (these rows). The thresholds are saved to
 results/label_thresholds.json. The video-level time split comes from the per-video dataset
 (data.py), so all country rows of a video share one split.
+Model: two gradient-boosting models on the same features, one without the channel numbers
+(ml.features.CHANNEL_NUMBER_FEATURES); the prediction is their logit blend (ml.features.blend,
+weight CONFIG["blend_weight"]), chosen in numeric_reliance.py to limit reliance on channel numbers.
 Copy the produced artifact to model/trending_model_v3.joblib and regenerate the reference
 predictions (make_reference.py) to deploy it.
 """
@@ -35,18 +38,20 @@ from data import _load_raw, build_dataset
 from embed import embeddings
 
 sys.path.insert(0, str(REPO))
-from ml.features import model_table, texts  # noqa: E402  (the app's feature code)
+from ml.features import CHANNEL_NUMBER_FEATURES, blend, model_table, texts  # noqa: E402  (the app's feature code)
 
 # Chosen on the validation set (see REPORT.md); not re-tuned here.
 CONFIG = {
     "text_C": 0.03,
     "pca_dims": 32,
     "recency_tau_days": 90,
+    # weight of the model WITHOUT channel numbers in the final blend (chosen with
+    # numeric_reliance.py: AUC -0.004, reliance on channel numbers -64 %)
+    "blend_weight": 0.5,
     "gbm": dict(learning_rate=0.03, max_leaf_nodes=63, min_samples_leaf=100, l2_regularization=0.0,
                 max_iter=4000, early_stopping=True, validation_fraction=0.1, n_iter_no_change=50,
                 random_state=SEED, categorical_features="from_dtype"),
 }
-SPLIT_END = {"train": pd.Timestamp("2025-10-29"), "val": pd.Timestamp("2025-12-02")}
 ROWS = CACHE / "rows_video_country.parquet"
 
 
@@ -65,11 +70,19 @@ def label_thresholds(rows):
     comment_th = rows.groupby("country")["video_comment_count"].median()
     (RESULTS / "label_thresholds.json").write_text(json.dumps({
         "description": "Label rule thresholds: medians over each country's first trending appearances "
-                       "(per video and country), 2024-10-12 to 2026-01-05. High performer = views >= "
+                       f"(per video and country), {rows['video_trending_date'].min().date()} to "
+                       f"{rows['video_trending_date'].max().date()}. High performer = views >= "
                        "view_threshold AND likes >= like_threshold AND comments >= comment_threshold.",
         "view_threshold": view_th.round(4).to_dict(), "like_threshold": like_th.to_dict(),
         "comment_threshold": comment_th.to_dict()}, indent=2))
     return view_th, like_th, comment_th
+
+
+def split_ends():
+    """Last first-appearance date of the training and validation videos. Rows dated after it
+    (a video's later appearances in other countries) are not used for fitting that stage."""
+    per_video = build_dataset()
+    return per_video.groupby("time_split")["video_trending_date"].max().to_dict()
 
 
 def load_rows():
@@ -81,6 +94,9 @@ def load_rows():
         raw["video_trending_date"] = pd.to_datetime(raw["video_trending_date"]).dt.normalize()
         df = (raw.sort_values(["video_trending_date", "country", "video_id"], kind="mergesort")
                  .drop_duplicates(["video_id", "country"], keep="first").reset_index(drop=True))
+        # Some 2026 snapshots have no statistics at all (YouTube returned none: views NULL);
+        # their label is unknown, so those (video, country) rows are left out.
+        df = df[df["video_view_count"].notna()].reset_index(drop=True)
         view_th, like_th, comment_th = label_thresholds(df)
         df["label"] = ((df["video_view_count"] >= df["country"].map(view_th))
                        & (df["video_like_count"] >= df["country"].map(like_th))
@@ -122,9 +138,13 @@ def fit(df, emb, mask):
     clips = clip_values(rows)
     X = model_table(rows, *clips, oof, pca.transform(e))
     age = (rows["video_trending_date"].max() - rows["video_trending_date"]).dt.days.values
-    gbm = HistGradientBoostingClassifier(**CONFIG["gbm"]).fit(X, y, sample_weight=np.exp(-age / CONFIG["recency_tau_days"]))
+    weight = np.exp(-age / CONFIG["recency_tau_days"])
+    gbm = HistGradientBoostingClassifier(**CONFIG["gbm"]).fit(X, y, sample_weight=weight)
+    no_channel = [c for c in X.columns if c not in CHANNEL_NUMBER_FEATURES]
+    gbm_no_channel = HistGradientBoostingClassifier(**CONFIG["gbm"]).fit(X[no_channel], y, sample_weight=weight)
     return {"config": CONFIG, "clips": clips, "text_model": text_full, "pca": pca, "gbm": gbm,
-            "columns": list(X.columns),
+            "gbm_no_channel": gbm_no_channel, "columns_no_channel": no_channel,
+            "blend_weight": CONFIG["blend_weight"], "columns": list(X.columns),
             "categories": {c: list(X[c].cat.categories) for c in ("video_category_id", "country")},
             "trained_until": str(rows["video_trending_date"].max().date()), "n_train": int(mask.sum())}
 
@@ -133,7 +153,8 @@ def predict(model, df, emb):
     X = model_table(df, *model["clips"], model["text_model"].predict_proba(emb)[:, 1], model["pca"].transform(emb))
     for col, cats in model["categories"].items():
         X[col] = pd.Categorical(X[col].astype(str), categories=cats)
-    return model["gbm"].predict_proba(X[model["columns"]])[:, 1]
+    return blend(model["gbm"].predict_proba(X[model["columns"]])[:, 1],
+                 model["gbm_no_channel"].predict_proba(X[model["columns_no_channel"]])[:, 1], model["blend_weight"])
 
 
 # ------------------------------------------------------------------------------------------
@@ -149,14 +170,16 @@ def main():
         return
     log(f"positive rate: {df['label'].mean():.3f}; by country {df.groupby('country')['label'].mean().round(3).to_dict()}")
     # validation: train on the training period only, score the validation period
-    tr = ((df["time_split"] == "train") & (df["video_trending_date"] <= SPLIT_END["train"])).values
+    ends = split_ends()
+    log(f"split ends: train {ends['train'].date()}, validation {ends['val'].date()}, test {ends['test'].date()}")
+    tr = ((df["time_split"] == "train") & (df["video_trending_date"] <= ends["train"])).values
     va = (df["time_split"] == "val").values
     val_model = fit(df, emb, tr)
     val = metrics(df["label"].values[va], predict(val_model, df[va], emb[va]))
     log(f"validation ROC-AUC {val['roc_auc']:.4f}")
     throttle.pause(throttle.STAGE_PAUSE, "cool-down")
 
-    fit_mask = (df["time_split"].isin(["train", "val"]) & (df["video_trending_date"] <= SPLIT_END["val"])).values
+    fit_mask = (df["time_split"].isin(["train", "val"]) & (df["video_trending_date"] <= ends["val"])).values
     test = (df["time_split"] == "test").values
     model = fit(df, emb, fit_mask)
     p, y = predict(model, df[test], emb[test]), df["label"].values[test]

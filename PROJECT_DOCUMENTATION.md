@@ -110,6 +110,20 @@ first `country_code`.
 
 ### Refreshing data
 
+New rows come either from the ingestion script (YouTube API, 50 videos per country per run) or
+in bulk from the public Kaggle dataset `canerkonuk/youtube-trending-videos-global` (CC0, the
+same YouTube API collection):
+
+```
+python pushing_into_database/import_kaggle_trending.py <youtube_trending_videos_global.parquet> [--dry-run]
+```
+
+It appends only days newer than each table's latest date, in one transaction, and never
+changes existing rows. Value conventions follow the existing rows: an empty count is 0, a
+hidden like/comment count (views present) is 0, and rows where YouTube returned no statistics
+keep NULL counts (the model's training leaves those out). Days 2026-01-06 to 2026-10-05 were
+added this way.
+
 After ingesting new rows, refresh the views as an admin (both have unique indexes, so
 `CONCURRENTLY` works and readers are not blocked):
 
@@ -291,7 +305,7 @@ response echoes the filters actually applied.
 | Piece | Location |
 |---|---|
 | Inference package | `ml/` (`inference.py` – `TrendingPredictor`; `features.py` – feature construction, shared with training; `schemas.py` – inputs, validation, category/country resolution) |
-| Model file | `model/trending_model_v3.joblib`: text logistic regression (with scaler), PCA (32 components), gradient-boosting model, clip values, column order and category lists |
+| Model file | `model/trending_model_v3.joblib`: text logistic regression (with scaler), PCA (32 components), two gradient-boosting models (with and without channel numbers) and the blend weight, clip values, column order and category lists |
 | Text encoder | `sentence-transformers/LaBSE`, revision `836121a0533e5664b21c7aacc5d22951f2b8b25b` (pinned in `ml/inference.py` and in the Docker image) |
 | API wrapper | `backend/app/services/predictions.py` |
 | Training and evaluation | `ml_training/` (`train_v3.py`, `make_reference.py`, `compare_v1.py`, `live_test.py`; report in `ml_training/REPORT.md`) |
@@ -333,9 +347,13 @@ From `services/predictions.py` (the text the API returns):
   comments ≥ that country's median and views ≥ 100,000 × (country median views / India median
   views); medians over all first trending appearances in each country.
 - **Not a prediction of** whether an arbitrary video will reach a trending list.
-- Training data: AU, CA, GB, IE, IN, NZ, US and ZA, 2024-10-12 to 2025-12-02.
-- ROC-AUC 0.923 on the newest held-out period (2025-12-03 to 2026-01-05; previous model 0.842 on
-  the same rows) and 0.891 on a live check of 397 trending videos (previous model 0.832).
+- Training data: AU, CA, GB, IE, IN, NZ, US and ZA, 2024-10-12 to 2026-07-19.
+- Model: 50/50 blend (average of log-odds) of two gradient-boosting models, one with and one
+  without the channel numbers (`ml.features.CHANNEL_NUMBER_FEATURES`, `ml.features.blend`), so
+  a wrong or extreme subscriber/view count moves a prediction about half as much.
+- ROC-AUC 0.902 on the newest held-out period (2026-07-20 to 2026-10-05; previous model 0.868 on
+  the same rows) and 0.851 on a live check of 398 trending videos on 2026-10-06 (previous model
+  0.849 on the same videos).
 - The share of high performers drifts over time, so probabilities can be off for a new period;
   ranking holds up better. Retrain periodically (`ml_training/REPORT.md`, "Retraining").
 

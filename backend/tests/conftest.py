@@ -14,8 +14,8 @@ from app.db.engine import dispose_engine, get_connection  # noqa: E402
 from app.repositories.filters import Filters  # noqa: E402
 
 MIN_DATE = date(2024, 10, 12)
-MAX_DATE = date(2026, 1, 5)
-W30_START = date(2025, 12, 7)
+MAX_DATE = date(2026, 10, 5)
+W30_START = date(2026, 9, 6)
 
 
 @pytest.fixture(scope="session", autouse=True)

@@ -1,33 +1,33 @@
 {
-  "description": "Label rule thresholds: medians over each country's first trending appearances (per video and country), 2024-10-12 to 2026-01-05. High performer = views >= view_threshold AND likes >= like_threshold AND comments >= comment_threshold.",
+  "description": "Label rule thresholds: medians over each country's first trending appearances (per video and country), 2024-10-12 to 2026-10-05. High performer = views >= view_threshold AND likes >= like_threshold AND comments >= comment_threshold.",
   "view_threshold": {
-    "AU": 115306.2622,
-    "CA": 89191.3754,
-    "GB": 72510.4427,
-    "IE": 203290.3071,
+    "AU": 132879.8087,
+    "CA": 94701.6255,
+    "GB": 72623.711,
+    "IE": 227503.3804,
     "IN": 100000.0,
-    "NZ": 265971.3425,
-    "US": 80755.4696,
-    "ZA": 121617.2493
+    "NZ": 301070.7011,
+    "US": 93168.9851,
+    "ZA": 124786.0049
   },
   "like_threshold": {
-    "AU": 9233.0,
-    "CA": 7185.0,
-    "GB": 5036.5,
-    "IE": 16817.0,
-    "IN": 5550.0,
-    "NZ": 20835.0,
-    "US": 6137.0,
-    "ZA": 5924.0
+    "AU": 7789.5,
+    "CA": 5695.0,
+    "GB": 3874.0,
+    "IE": 13606.0,
+    "IN": 3585.0,
+    "NZ": 16625.0,
+    "US": 5344.0,
+    "ZA": 4524.5
   },
   "comment_threshold": {
-    "AU": 782.0,
-    "CA": 630.0,
-    "GB": 459.5,
-    "IE": 942.0,
-    "IN": 160.0,
-    "NZ": 1237.0,
-    "US": 566.0,
-    "ZA": 431.0
+    "AU": 623.0,
+    "CA": 487.0,
+    "GB": 353.0,
+    "IE": 874.0,
+    "IN": 92.0,
+    "NZ": 1115.0,
+    "US": 471.0,
+    "ZA": 373.5
   }
 }

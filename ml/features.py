@@ -29,6 +29,13 @@ NUMERIC_FEATURES = (
     "video_volume_bucket",
 )
 CATEGORICAL_FEATURES = ("video_category_id", "country")
+# Features computed from the channel's numbers (subscribers, channel views, video count).
+# The second model of the blend is trained without them (see blend()).
+CHANNEL_NUMBER_FEATURES = (
+    "log_subscriber_count", "log_view_count", "channel_authority", "views_per_video_log",
+    "subs_per_video_log", "legacy_channel", "video_volume_bucket", "log_video_count",
+    "log_views_per_sub",
+)
 
 # Keyword lists (whole-word matches on title, description and tags).
 URGENCY_WORDS = {
@@ -174,6 +181,14 @@ def content_features(df):
 def logit(p):
     p = np.clip(np.asarray(p, dtype=float), 1e-6, 1 - 1e-6)
     return np.log(p / (1 - p))
+
+
+def blend(p_full, p_no_channel, weight):
+    """Final probability: logit average of the model with channel numbers and the model
+    without them (`weight` on the latter). Halves how much channel numbers can move a
+    prediction, so a wrong subscriber/view count cannot dominate the title and text."""
+    z = (1 - weight) * logit(p_full) + weight * logit(p_no_channel)
+    return 1 / (1 + np.exp(-z))
 
 
 def model_table(df, vpv_clip, spv_clip, text_probability, text_components):

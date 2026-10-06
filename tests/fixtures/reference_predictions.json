@@ -1,7 +1,7 @@
 {
  "generated_by": "ml_training/make_reference.py (training pipeline; verified equal to ml/ inference)",
  "model": "trending_model_v3.joblib",
- "model_sha256": "ece72f267693637d41a460d2230402e02fb18787ad7e21c9ce14618953276e0b",
+ "model_sha256": "6b908f0417adcc7207e28d16c046d37b46162caefa0b635bf2e9e415f3191db6",
  "cases": [
   {
    "name": "sports_baseline",
@@ -18,8 +18,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.986526395481329,
-    "text_score": 0.5862341034078218,
+    "high_performance_probability": 0.5278827193988544,
+    "text_score": 0.48134182729569336,
     "category": "Sports",
     "country": "IN"
    }
@@ -39,8 +39,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.75102865385591,
-    "text_score": 0.5862341034078218,
+    "high_performance_probability": 0.3042229965656307,
+    "text_score": 0.48134182729569336,
     "category": "Sports",
     "country": "AU"
    }
@@ -60,8 +60,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.9027108032997012,
-    "text_score": 0.5862341034078218,
+    "high_performance_probability": 0.29773948900157704,
+    "text_score": 0.48134182729569336,
     "category": "Sports",
     "country": "CA"
    }
@@ -81,8 +81,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.9642597688042488,
-    "text_score": 0.5862341034078218,
+    "high_performance_probability": 0.33299281795995583,
+    "text_score": 0.48134182729569336,
     "category": "Sports",
     "country": "GB"
    }
@@ -102,8 +102,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.911553196615203,
-    "text_score": 0.5862341034078218,
+    "high_performance_probability": 0.566474679518541,
+    "text_score": 0.48134182729569336,
     "category": "Sports",
     "country": "IE"
    }
@@ -123,8 +123,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.9130150941859376,
-    "text_score": 0.5862341034078218,
+    "high_performance_probability": 0.728669744645255,
+    "text_score": 0.48134182729569336,
     "category": "Sports",
     "country": "NZ"
    }
@@ -144,8 +144,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.9508609394438388,
-    "text_score": 0.5862341034078218,
+    "high_performance_probability": 0.36744160346722293,
+    "text_score": 0.48134182729569336,
     "category": "Sports",
     "country": "US"
    }
@@ -165,8 +165,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.9746268456809039,
-    "text_score": 0.5862341034078218,
+    "high_performance_probability": 0.3646373525993133,
+    "text_score": 0.48134182729569336,
     "category": "Sports",
     "country": "ZA"
    }
@@ -186,8 +186,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.08515013214893231,
-    "text_score": 0.06591337471961115,
+    "high_performance_probability": 0.2729677731951865,
+    "text_score": 0.10606399374493133,
     "category": "Music",
     "country": "IN"
    }
@@ -207,8 +207,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.4228307989746796,
-    "text_score": 0.07946894117994695,
+    "high_performance_probability": 0.22712848365904184,
+    "text_score": 0.09136823917103024,
     "category": "News & Politics",
     "country": "IN"
    }
@@ -228,8 +228,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.39365693884267716,
-    "text_score": 0.042905724725214076,
+    "high_performance_probability": 0.4717237529197696,
+    "text_score": 0.12296442102155679,
     "category": "Gaming",
     "country": "IN"
    }
@@ -249,8 +249,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.5753771878065246,
-    "text_score": 0.2384901440154264,
+    "high_performance_probability": 0.6685167970034457,
+    "text_score": 0.2809998128987787,
     "category": "Entertainment",
     "country": "IN"
    }
@@ -270,8 +270,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.8424681023642558,
-    "text_score": 0.13883855715321874,
+    "high_performance_probability": 0.5418780757596617,
+    "text_score": 0.1270450802415985,
     "category": "Comedy",
     "country": "IN"
    }
@@ -291,8 +291,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.8599166402654053,
-    "text_score": 0.3134499881158132,
+    "high_performance_probability": 0.3704361122136692,
+    "text_score": 0.5086539957273963,
     "category": "People & Blogs",
     "country": "IN"
    }
@@ -312,8 +312,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.9911197654331824,
-    "text_score": 0.5862341034078218,
+    "high_performance_probability": 0.6109435597095977,
+    "text_score": 0.48134182729569336,
     "category": "Education",
     "country": "IN"
    }
@@ -333,8 +333,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.9546585577802273,
-    "text_score": 0.5862341034078218,
+    "high_performance_probability": 0.5215782420832169,
+    "text_score": 0.48134182729569336,
     "category": "Education",
     "country": "IN"
    }
@@ -354,8 +354,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.9524242986449568,
-    "text_score": 0.5862341034078218,
+    "high_performance_probability": 0.38833677266441924,
+    "text_score": 0.48134182729569336,
     "category": "Education",
     "country": "IN"
    }
@@ -375,8 +375,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.9911765618794697,
-    "text_score": 0.5862341034078218,
+    "high_performance_probability": 0.6109435597095977,
+    "text_score": 0.48134182729569336,
     "category": "Education",
     "country": "IN"
    }
@@ -396,8 +396,8 @@
     "channel_view_count": 0
    },
    "expected": {
-    "high_performance_probability": 0.006060552477474868,
-    "text_score": 0.5862341034078218,
+    "high_performance_probability": 0.021285970531785752,
+    "text_score": 0.48134182729569336,
     "category": "Howto & Style",
     "country": "IN"
    }
@@ -417,8 +417,8 @@
     "channel_view_count": 100000000000
    },
    "expected": {
-    "high_performance_probability": 0.9859011997339483,
-    "text_score": 0.5862341034078218,
+    "high_performance_probability": 0.7587826122893534,
+    "text_score": 0.48134182729569336,
     "category": "Film & Animation",
     "country": "IN"
    }
@@ -438,8 +438,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.8118584574893635,
-    "text_score": 0.5862341034078218,
+    "high_performance_probability": 0.27682419305108874,
+    "text_score": 0.48134182729569336,
     "category": "Science & Technology",
     "country": "IN"
    }
@@ -459,8 +459,8 @@
     "channel_view_count": 4200
    },
    "expected": {
-    "high_performance_probability": 0.005911165186442731,
-    "text_score": 0.5862341034078218,
+    "high_performance_probability": 0.019667077236741878,
+    "text_score": 0.48134182729569336,
     "category": "Travel & Events",
     "country": "IN"
    }
@@ -480,8 +480,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.8923258047133844,
-    "text_score": 0.5862341034078218,
+    "high_performance_probability": 0.3068702317560691,
+    "text_score": 0.48134182729569336,
     "category": "Autos & Vehicles",
     "country": "US"
    }
@@ -501,8 +501,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.7156972250384162,
-    "text_score": 0.5862341034078218,
+    "high_performance_probability": 0.19568407920493824,
+    "text_score": 0.48134182729569336,
     "category": "Pets & Animals",
     "country": "GB"
    }
@@ -522,8 +522,8 @@
     "channel_view_count": 19600000000
    },
    "expected": {
-    "high_performance_probability": 0.8572303917586398,
-    "text_score": 0.5862341034078231,
+    "high_performance_probability": 0.16281558665121199,
+    "text_score": 0.48134182729569314,
     "category": "Music",
     "country": "IN"
    }

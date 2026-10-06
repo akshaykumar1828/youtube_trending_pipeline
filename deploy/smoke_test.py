@@ -1,6 +1,6 @@
 """Real-HTTP smoke test of the running Docker stack, through nginx (no mocks, stdlib only).
 
-    python deploy/smoke_test.py [--base http://localhost:8080]
+    python deploy/smoke_test.py [--base http://localhost:8080]   (default: WEB_PORT from .env, else 8080)
     python deploy/smoke_test.py --persisted-login    # after a restart: that account still works
 
 Creates throwaway accounts named smoke-*@example.test in the DEPLOYMENT database (never the
@@ -198,7 +198,11 @@ def persisted_login(base):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--base", default="http://localhost:8080")
+    env = REPO / ".env"
+    port = next((line.split("=", 1)[1].strip().strip("\"'") for line in
+                 (env.read_text(encoding="utf-8").splitlines() if env.exists() else [])
+                 if line.startswith("WEB_PORT=")), "") or "8080"
+    parser.add_argument("--base", default=f"http://localhost:{port}")
     parser.add_argument("--persisted-login", action="store_true")
     args = parser.parse_args()
     persisted_login(args.base) if args.persisted_login else run(args.base)

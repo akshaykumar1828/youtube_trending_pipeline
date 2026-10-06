@@ -85,7 +85,7 @@ def test_filter_params_propagate_to_build_filters_and_repository(client, mocks):
                       "countries": ["in", "US"], "categories": ["Music", "news & politics"]}
     (repo_conn, repo_filters), _ = mocks["get_kpis"].calls[0]
     assert repo_conn is conn and repo_filters is FAKE_FILTERS  # same request-scoped connection
-    assert r.json()["filters"] == {"start_date": "2025-12-07", "end_date": "2026-01-05", "days": 30,
+    assert r.json()["filters"] == {"start_date": "2026-09-06", "end_date": "2026-10-05", "days": 30,
                                    "countries": ["IN"], "categories": []}
 
 

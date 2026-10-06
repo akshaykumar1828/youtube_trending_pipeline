@@ -2,6 +2,6 @@
   "directory": "model",
   "algorithm": "sha256",
   "files": {
-    "trending_model_v3.joblib": "ece72f267693637d41a460d2230402e02fb18787ad7e21c9ce14618953276e0b"
+    "trending_model_v3.joblib": "6b908f0417adcc7207e28d16c046d37b46162caefa0b635bf2e9e415f3191db6"
   }
 }

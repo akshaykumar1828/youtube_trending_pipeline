@@ -1,0 +1,30 @@
+{
+  "fetched_at_utc": "2026-10-06T09:45:32+00:00",
+  "model": "trending_model_v3.joblib",
+  "videos": 398,
+  "rejected_categories": 0,
+  "all": {
+    "videos": 398,
+    "actual_positive_rate": 0.5578,
+    "roc_auc": 0.8507,
+    "accuracy_at_0.5": 0.7387,
+    "mean_predicted": 0.3949
+  },
+  "published_last_48h": {
+    "videos": 207,
+    "actual_positive_rate": 0.5217,
+    "roc_auc": 0.8432,
+    "accuracy_at_0.5": 0.7633,
+    "mean_predicted": 0.4306
+  },
+  "accuracy_by_country": {
+    "AU": 0.74,
+    "CA": 0.76,
+    "GB": 0.8,
+    "IE": 0.62,
+    "IN": 0.771,
+    "NZ": 0.72,
+    "US": 0.78,
+    "ZA": 0.72
+  }
+}

@@ -119,16 +119,19 @@ class PredictionService:
             "components": {
                 "text": "Text score: logistic regression on the LaBSE embedding of channel name, title, "
                         "description and tags (only the first 256 tokens are read).",
-                "high_performance_probability": "Gradient-boosting model on channel statistics, duration, "
-                                                "category, country, title/description/tag signals and the "
-                                                "text (text score plus 32 embedding components).",
+                "high_performance_probability": "50/50 blend (average of log-odds) of two gradient-boosting "
+                                                "models on duration, category, country, title/description/tag "
+                                                "signals and the text (text score plus 32 embedding "
+                                                "components); only one of them also uses the channel "
+                                                "statistics, so channel numbers cannot dominate the result.",
             },
             "reported_metrics": {
-                "roc_auc": "0.923",
-                "roc_auc_live": "0.891",
-                "note": "ROC-AUC on the newest held-out period (2025-12-03 to 2026-01-05, 26,300 video-country "
-                        "rows), never used for training or model choice; the previous model scored 0.842 on the "
-                        "same rows. Live: 397 videos on YouTube's trending lists on 2026-10-05 (previous model 0.832).",
+                "roc_auc": "0.902",
+                "roc_auc_live": "0.851",
+                "note": "ROC-AUC on the newest held-out period (2026-07-20 to 2026-10-05, 60,616 video-country "
+                        "rows), never used for training or model choice; the previous model scored 0.868 on the "
+                        "same rows. Live: 398 videos on YouTube's trending lists on 2026-10-06 (previous model "
+                        "0.849 on the same videos).",
             },
             "limitations": [
                 "Only videos already trending were used for training; the score is not a trending-entry probability.",

@@ -19,7 +19,7 @@ from app.core.settings import Settings  # noqa: E402
 from app.repositories.filters import Filters  # noqa: E402
 from app.services.auth import Principal  # noqa: E402
 
-W30_START, MAX_DATE, MIN_DATE = dt.date(2025, 12, 7), dt.date(2026, 1, 5), dt.date(2024, 10, 12)
+W30_START, MAX_DATE, MIN_DATE = dt.date(2026, 9, 6), dt.date(2026, 10, 5), dt.date(2024, 10, 12)
 
 TEST_AUTH_SECRET = "test-only-session-hmac-key-not-a-real-secret-0123456789"
 
@@ -52,7 +52,7 @@ FAKE_FILTERS = Filters(W30_START, MAX_DATE, countries=("IN",), categories=())
 COUNT = {"value": 10, "previous": 8, "change_pct": 25.0}
 KPIS = {
     "period": {"start_date": W30_START, "end_date": MAX_DATE, "days": 30},
-    "previous_period": {"start_date": dt.date(2025, 11, 7), "end_date": dt.date(2025, 12, 6), "days": 30,
+    "previous_period": {"start_date": dt.date(2026, 8, 7), "end_date": dt.date(2026, 9, 5), "days": 30,
                         "available": True},
     "unique_videos": COUNT, "trending_volume": COUNT, "views": COUNT, "unique_channels": COUNT,
     "engagement_rate": {"value": 0.03, "previous": 0.02, "change_pts": 1.0},

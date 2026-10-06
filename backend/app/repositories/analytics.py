@@ -214,7 +214,9 @@ def get_engagement_analysis(conn: Connection, filters: Filters, scatter_limit: i
                 "category": c["category"],
                 "videos": c["videos"],
                 "videos_with_views": c["videos_with_views"],
-                **{f"p{round(p * 100)}": v for p, v in zip(CATEGORY_PERCENTILES, c["percentiles"])},
+                # A category whose videos all lack views has no percentiles (None), like the overall ones.
+                **{f"p{round(p * 100)}": v for p, v in
+                   zip(CATEGORY_PERCENTILES, c["percentiles"] or [None] * len(CATEGORY_PERCENTILES))},
             }
             for c in (r.by_category or [])
         ],

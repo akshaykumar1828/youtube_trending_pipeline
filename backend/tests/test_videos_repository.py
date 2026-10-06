@@ -31,9 +31,9 @@ def ids(result):
 # ---------------------------------------------------
 def test_total_equals_unique_videos(conn, w30):
     result = videos.list_videos(conn, w30)
-    assert result["total"] == overview.get_kpis(conn, w30)["unique_videos"]["value"] == 13213
+    assert result["total"] == overview.get_kpis(conn, w30)["unique_videos"]["value"] == 13158
     assert (result["page"], result["page_size"], len(result["items"])) == (1, 25, 25)
-    assert result["total_pages"] == math.ceil(13213 / 25)
+    assert result["total_pages"] == math.ceil(13158 / 25)
 
 
 def test_pages_are_disjoint_and_stable(conn, w30):
@@ -46,10 +46,10 @@ def test_pages_are_disjoint_and_stable(conn, w30):
 
 
 def test_last_and_past_end_pages(conn, w30):
-    last = videos.list_videos(conn, w30, page=529)
-    assert len(last["items"]) == 13213 - 528 * 25
-    past = videos.list_videos(conn, w30, page=530)
-    assert past["items"] == [] and past["total"] == 13213
+    last = videos.list_videos(conn, w30, page=527)
+    assert len(last["items"]) == 13158 - 526 * 25
+    past = videos.list_videos(conn, w30, page=528)
+    assert past["items"] == [] and past["total"] == 13158
 
 
 @pytest.mark.parametrize("kwargs", [
@@ -158,7 +158,7 @@ def test_search_case_insensitive_substring(conn, w30):
 def test_search_wildcards_are_literal(conn, w30, needle):
     result = videos.list_videos(conn, w30, search=needle, page_size=100)
     assert result["total"] == independent_search_count(conn, needle)
-    assert result["total"] < 13213
+    assert result["total"] < 13158
     assert all(needle.lower() in (i["title"] + " " + i["channel_title"]).lower() for i in result["items"])
 
 
@@ -174,7 +174,7 @@ def test_search_combines_with_filters(conn, w30):
 
 
 def test_blank_search_means_no_search(conn, w30):
-    assert videos.list_videos(conn, w30, search="   ")["total"] == 13213
+    assert videos.list_videos(conn, w30, search="   ")["total"] == 13158
 
 
 @pytest.mark.parametrize("search", ["a", "x" * 101, 123, ["cricket"]])

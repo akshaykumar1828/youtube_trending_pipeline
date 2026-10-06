@@ -47,7 +47,7 @@ FILTER_CASES = {
     "default": ([], {}),
     "IN+US+Music": ([("country", "in"), ("country", "US"), ("category", "music")],
                     {"countries": ["in", "US"], "categories": ["music"]}),
-    "single-day": ([("start_date", "2026-01-05"), ("end_date", "2026-01-05")],
+    "single-day": ([("start_date", "2026-10-05"), ("end_date", "2026-10-05")],
                    {"start_date": MAX_DATE, "end_date": MAX_DATE}),
 }
 
@@ -61,7 +61,7 @@ def test_meta_filters(client, conn):
         "countries": meta.get_countries(conn), "categories": meta.get_categories(conn),
         "date_range": {"min_date": MIN_DATE, "max_date": MAX_DATE},
         "default_range": {"start_date": W30_START, "end_date": MAX_DATE, "days": 30}}})
-    assert len(body["data"]["countries"]) == 9 and len(body["data"]["categories"]) == 16
+    assert len(body["data"]["countries"]) == 9 and len(body["data"]["categories"]) == 17  # + Movies (2026 data)
 
 
 # ---------------------------------------------------
@@ -92,13 +92,13 @@ def test_all_time_kpis_and_videos(client, conn, all_time):
     params = [("start_date", MIN_DATE.isoformat()), ("end_date", MAX_DATE.isoformat())]
     assert get(client, "/api/v1/overview/kpis", params) == expected_filtered(all_time, overview.get_kpis(conn, all_time))
     page = get(client, "/api/v1/videos", params)
-    assert page["data"]["total"] == 99402
+    assert page["data"]["total"] == 217115
     assert page == expected_filtered(all_time, videos.list_videos(conn, all_time))
 
 
 def test_default_window_is_echoed(client):
     assert get(client, "/api/v1/overview/kpis")["filters"] == {
-        "start_date": "2025-12-07", "end_date": "2026-01-05", "days": 30, "countries": [], "categories": []}
+        "start_date": "2026-09-06", "end_date": "2026-10-05", "days": 30, "countries": [], "categories": []}
 
 
 # ---------------------------------------------------
@@ -124,7 +124,7 @@ def test_pagination_deterministic_and_disjoint(client):
     both = get(client, "/api/v1/videos", {"page": 1, "page_size": 40})
     assert ids(p1) + ids(p2) == ids(both) and not set(ids(p1)) & set(ids(p2))
     assert ids(get(client, "/api/v1/videos", {"page": 1, "page_size": 20})) == ids(p1)
-    assert p1["data"]["total"] == 13213 and p1["data"]["total_pages"] == 661
+    assert p1["data"]["total"] == 13158 and p1["data"]["total_pages"] == 658
 
 
 @pytest.mark.parametrize("sort", list(videos.VIDEO_SORTS))
@@ -146,7 +146,7 @@ def test_repository_validation_surfaces_as_422(client):
     assert (err["code"], err["field"]) == ("invalid_parameter", "search")
     err = get(client, "/api/v1/overview/kpis", [("country", "SGX")], status=422)["error"]
     assert (err["code"], err["field"]) == ("invalid_filter", "countries")
-    err = get(client, "/api/v1/analytics/categories", {"end_date": "2026-01-06"}, status=422)["error"]
+    err = get(client, "/api/v1/analytics/categories", {"end_date": "2026-10-06"}, status=422)["error"]
     assert (err["code"], err["field"]) == ("invalid_filter", "end_date")
     err = get(client, "/api/v1/overview/kpis", {"start_date": "2026-01-05", "end_date": "2026-01-01"}, status=422)["error"]
     assert err["field"] == "start_date"
