@@ -1,17 +1,17 @@
-"""Tests for the standalone ML inference layer (ml/).
+"""Tests for the ML inference layer (ml/, model v3).
 
-The model is frozen: these tests prove that ml/ reproduces the legacy
-predictor.py exactly, never modifies the artifacts, and does not need Streamlit.
+They prove that the app's inference reproduces the training pipeline exactly (the reference
+predictions were produced by ml_training/make_reference.py from the training code), that the
+model file is the one that was evaluated, and that inputs are validated before the model.
 """
 
 import hashlib
 import json
 import re
-import subprocess
 import sys
 from pathlib import Path
 
-import numpy as np
+import pandas as pd
 import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -27,36 +27,26 @@ CASES = REFERENCE["cases"]
 CASE_IDS = [c["name"] for c in CASES]
 
 
-# ---------------------------------------------------
-# NO STREAMLIT (runs first, in a fresh interpreter, before fixtures load models)
-# ---------------------------------------------------
-def test_inference_runs_without_streamlit():
-    code = (
-        "import sys; sys.path.insert(0, r'%s')\n"
-        "from ml import TrendingPredictor, PredictionInput\n"
-        "p = TrendingPredictor()\n"
-        "r = p.predict(PredictionInput(category='Sports', country='IN', video_duration_sec=140,"
-        " channel_subscriber_count=1000, channel_video_count=10, channel_view_count=50000, video_title='t'))\n"
-        "assert 0.0 <= r.final_probability <= 1.0\n"
-        "print('streamlit_loaded=' + str('streamlit' in sys.modules))\n" % ROOT
-    )
-    out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, timeout=600)
-    assert out.returncode == 0, out.stderr[-2000:]
-    assert "streamlit_loaded=False" in out.stdout
-
-
-def test_ml_package_has_no_streamlit_import():
-    for path in (ROOT / "ml").glob("*.py"):
-        assert "streamlit" not in path.read_text(encoding="utf-8"), path.name
+def as_input(d):
+    return PredictionInput(
+        category=d["video_category_id"], country=d["country"], video_duration_sec=d["video_duration_sec"],
+        channel_subscriber_count=d["channel_subscriber_count"], channel_video_count=d["channel_video_count"],
+        channel_view_count=d["channel_view_count"], video_title=d["video_title"],
+        video_description=d["video_description"], video_tags=d["video_tags"], channel_title=d["channel_title"])
 
 
 # ---------------------------------------------------
-# ARTIFACTS ARE FROZEN
+# THE MODEL FILE IS THE EVALUATED ONE
 # ---------------------------------------------------
-def test_artifacts_unchanged():
+def test_model_directory_matches_manifest():
     model_dir = ROOT / ARTIFACT_HASHES["directory"]
     actual = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(model_dir.iterdir())}
     assert actual == ARTIFACT_HASHES["files"]
+
+
+def test_reference_predictions_belong_to_this_model():
+    path = ROOT / "model" / REFERENCE["model"]
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == REFERENCE["model_sha256"]
 
 
 def test_ml_code_never_writes_or_fits():
@@ -65,138 +55,89 @@ def test_ml_code_never_writes_or_fits():
         assert not pattern.search(path.read_text(encoding="utf-8")), path.name
 
 
+def test_ml_package_has_no_ui_imports():
+    for path in (ROOT / "ml").glob("*.py"):
+        text = path.read_text(encoding="utf-8")
+        assert "streamlit" not in text and "fastapi" not in text, path.name
+
+
 # ---------------------------------------------------
-# FIXTURES
+# LOADING
 # ---------------------------------------------------
 @pytest.fixture(scope="session")
 def predictor():
     return TrendingPredictor()
 
 
-@pytest.fixture(scope="session")
-def legacy():
-    import predictor as legacy_predictor  # unmodified Streamlit-coupled module (bare mode)
-    return legacy_predictor
+def test_model_loads(predictor):
+    assert predictor.embedder.get_embedding_dimension() == 768
+    assert predictor.pca.n_components_ == 32
+    assert predictor.gbm.n_features_in_ == len(predictor.columns)
+    assert predictor.trained_until == "2025-12-02"
 
 
-# ---------------------------------------------------
-# LOADING + DIMENSIONS
-# ---------------------------------------------------
-def test_artifacts_and_labse_load(predictor):
-    assert predictor.embedder.get_sentence_embedding_dimension() == 768
-    assert predictor.text_scaler.n_features_in_ == 768
-    assert predictor.text_lr.n_features_in_ == 768
-    assert predictor.rf_calibrated.n_features_in_ == 31
-    assert predictor.psych_scaler.n_features_in_ == 8
-    assert predictor.psych_lr.n_features_in_ == 8
-    assert predictor.meta_lr.n_features_in_ == 3
+def test_feature_table_matches_model_columns(predictor):
+    row = pd.DataFrame([{**CASES[0]["input"], "video_category_id": "Sports"}])
+    table = features.model_table(row, predictor.vpv_clip, predictor.spv_clip, [0.5],
+                                 predictor.pca.transform(predictor.embedder.encode(features.texts(row))))
+    assert list(table.columns) == predictor.columns
 
 
-def test_feature_dimensions_and_order_match_model(predictor):
-    num = features.numeric_features(140, 1000, 10, 50000, predictor.vpv_clip, predictor.spv_clip)
-    cat = predictor.ohe.transform(features.categorical_frame("Sports", "IN"))
-    psych = features.psych_features("title")
-
-    assert num.shape == (1, len(features.NUMERIC_FEATURES)) == (1, 8)
-    assert cat.shape == (1, 23)
-    assert cat.shape[1] + num.shape[1] == predictor.rf_calibrated.n_features_in_
-    assert psych.shape == (1, 8)
-    assert tuple(predictor.psych_scaler.feature_names_in_) == features.PSYCH_FEATURES
-    assert tuple(predictor.ohe.feature_names_in_) == ("video_category_id", "country")
-
-
-def test_supported_values_come_from_encoder(predictor):
+def test_supported_values_come_from_training_data(predictor):
     assert predictor.supported_countries == ("AU", "CA", "GB", "IE", "IN", "NZ", "US", "ZA")
     assert "None" not in predictor.supported_categories
-    assert len(predictor.supported_categories) == 14
+    assert len(predictor.supported_categories) == 15
+    assert "Nonprofits & Activism" in predictor.supported_categories
 
 
 # ---------------------------------------------------
-# PARITY WITH THE LEGACY PREDICTOR
+# PARITY WITH THE TRAINING PIPELINE
 # ---------------------------------------------------
 @pytest.mark.parametrize("case", CASES, ids=CASE_IDS)
 def test_matches_reference_predictions(predictor, case):
-    result = predictor.predict(PredictionInput.from_legacy_dict(case["input"]))
-    assert result.to_legacy_dict() == case["expected"]
+    result = predictor.predict(as_input(case["input"]))
+    expected = case["expected"]
+    assert abs(result.final_probability - expected["high_performance_probability"]) <= 1e-9
+    assert abs(result.text_score - expected["text_score"]) <= 1e-9
+    assert (result.category, result.country) == (expected["category"], expected["country"])
 
 
-class _Recorder:
-    """Wraps a model and records every array passed to predict_proba."""
-
-    def __init__(self, model):
-        self.model = model
-        self.inputs = []
-
-    def predict_proba(self, X):
-        self.inputs.append(np.array(X, copy=True))
-        return self.model.predict_proba(X)
+def test_predictions_are_deterministic(predictor):
+    a = predictor.predict(as_input(CASES[0]["input"]))
+    b = predictor.predict(as_input(CASES[0]["input"]))
+    assert a == b
 
 
-def _record(monkeypatch, owner):
-    recorders = {}
-    for name in ("text_lr", "rf_calibrated", "psych_lr", "meta_lr"):
-        recorders[name] = _Recorder(getattr(owner, name))
-        monkeypatch.setattr(owner, name, recorders[name])
-    return recorders
-
-
-@pytest.mark.parametrize("case", CASES, ids=CASE_IDS)
-def test_model_inputs_identical_to_legacy(predictor, legacy, monkeypatch, case):
-    legacy_rec = _record(monkeypatch, legacy)
-    new_rec = _record(monkeypatch, predictor)
-
-    legacy.predict_trending(case["input"])
-    predictor.predict(PredictionInput.from_legacy_dict(case["input"]))
-
-    # Embedding, RF and psychology inputs must be bit-identical.
-    for name in ("text_lr", "rf_calibrated", "psych_lr"):
-        (old,), (new,) = legacy_rec[name].inputs, new_rec[name].inputs
-        assert old.shape == new.shape, name
-        assert np.array_equal(old, new), name
-
-    # Meta input = [text_prob, rf_prob, psych_prob]. The frozen RandomForest uses
-    # n_jobs=-1, so its threaded tree summation varies by ~1e-16 between calls
-    # even in the legacy predictor; only the rf_prob column gets a tolerance.
-    (old,), (new,) = legacy_rec["meta_lr"].inputs, new_rec["meta_lr"].inputs
-    assert old.shape == new.shape == (1, 3)
-    assert old[0, 0] == new[0, 0] and old[0, 2] == new[0, 2]
-    assert abs(old[0, 1] - new[0, 1]) <= 1e-12
-
-
-def test_intentional_difference_numeric_category_id(predictor, legacy):
-    """Legacy silently drops ID '17'; the input adapter maps it to 'Sports'."""
-    case = REFERENCE["intentional_difference_cases"][0]
-    legacy_out = legacy.predict_trending(case["input"])
-    assert legacy_out == case["legacy_output"]
-
-    new = predictor.predict(PredictionInput.from_legacy_dict(case["input"]))
-    as_name = legacy.predict_trending({**case["input"], "video_category_id": "Sports"})
-
-    assert new.category == "Sports"
-    assert new.to_legacy_dict() == as_name
-    assert new.to_legacy_dict() != legacy_out
+def test_country_changes_the_prediction(predictor):
+    base = CASES[0]["input"]
+    probs = {c: predictor.predict(as_input({**base, "country": c})).final_probability for c in ("IN", "AU", "GB")}
+    assert len({round(p, 6) for p in probs.values()}) == 3
 
 
 # ---------------------------------------------------
-# PSYCHOLOGY FEATURES (frozen legacy behaviour, explicit constants)
+# FEATURES
 # ---------------------------------------------------
-def test_psychology_features_reproduce_legacy_constants():
-    vec = features.psych_features("BREAKING viral official emotional news 2025?!")[0]
-    as_dict = dict(zip(features.PSYCH_FEATURES, vec))
-    for name in ("has_urgency", "has_hype", "has_official_words", "has_emotion",
-                 "title_description_overlap_ratio"):
-        assert as_dict[name] == 0, name
-    assert as_dict["has_number_in_title"] == 1
-    assert as_dict["has_question_mark"] == 1
-    assert as_dict["has_exclamation"] == 1
+def _content(title="", description="", tags=""):
+    df = pd.DataFrame([{"video_title": title, "video_description": description, "video_tags": tags}])
+    return features.content_features(df).iloc[0].to_dict()
 
 
-def test_result_exposes_features(predictor):
-    case = CASES[0]
-    result = predictor.predict(PredictionInput.from_legacy_dict(case["input"]))
-    assert list(result.features["numeric"]) == list(features.NUMERIC_FEATURES)
-    assert list(result.features["psychology"]) == list(features.PSYCH_FEATURES)
-    assert result.country == "IN" and result.category == "Sports"
+def test_question_and_exclamation_marks_are_seen():
+    c = _content("Why is this happening?! 2025")
+    assert c["title_has_question"] == 1 and c["title_has_exclamation"] == 1 and c["title_has_digit"] == 1
+
+
+def test_keywords_match_whole_words_only():
+    assert _content("Breaking news today")["kw_urgency"] == 1
+    assert _content("You know what we delivered")["kw_urgency"] == 0   # 'now' / 'live' inside other words
+
+
+def test_tags_split_on_commas():
+    assert _content(tags="india vs australia,cricket, highlights")["tag_count"] == 3
+
+
+def test_text_order_and_cleaning():
+    assert features.build_text("Star Sports", "Final Over!", "Watch now.", "a,b") == "star sports final over watch now ab"
 
 
 # ---------------------------------------------------
@@ -210,12 +151,8 @@ def _input(**overrides):
 
 
 @pytest.mark.parametrize("category, expected", [
-    ("Sports", "Sports"),
-    ("sports", "Sports"),
-    (" Music ", "Music"),
-    ("17", "Sports"),
-    (17, "Sports"),
-    ("28", "Science & Technology"),
+    ("Sports", "Sports"), ("sports", "Sports"), (" Music ", "Music"), ("17", "Sports"), (17, "Sports"),
+    ("28", "Science & Technology"), ("29", "Nonprofits & Activism"),
 ])
 def test_supported_category(predictor, category, expected):
     assert predictor.predict(_input(category=category)).category == expected
@@ -225,7 +162,6 @@ def test_supported_category(predictor, category, expected):
     ("Cooking", "unsupported category 'Cooking'"),
     ("None", "unsupported category 'None'"),
     ("", "unsupported category ''"),
-    ("29", "(Nonprofits & Activism) is not supported"),
     ("999", "unknown YouTube category ID '999'"),
     (None, "must be a category name or YouTube category ID"),
 ])

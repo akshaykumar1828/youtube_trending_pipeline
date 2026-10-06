@@ -10,9 +10,7 @@ import { formatRate } from '../../lib/format';
 import { isValidationError } from './form';
 
 const COMPONENTS: { key: keyof Prediction['components']; label: string }[] = [
-  { key: 'text', label: 'Text' },
-  { key: 'channel_and_numeric', label: 'Channel & numeric' },
-  { key: 'psychology', label: 'Title signals' },
+  { key: 'text', label: 'Text score' },
 ];
 
 function ScoreBar({ value, strong = false }: { value: number; strong?: boolean }) {
@@ -144,7 +142,7 @@ export function PredictionResult({
 
       <section aria-labelledby="components-heading">
         <h3 id="components-heading" className="text-xs font-semibold text-slate-700">
-          Component scores
+          What the text alone suggests
         </h3>
         <dl className="mt-2 space-y-3">
           {COMPONENTS.map(({ key, label }) => (

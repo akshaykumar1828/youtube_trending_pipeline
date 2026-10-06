@@ -1,9 +1,9 @@
-"""Build-time only: put the exact LaBSE revision the frozen model was validated with into a
+"""Build-time only: put the exact LaBSE revision the model was trained with into a
 Hugging Face cache directory, verified file by file against labse.sha256.
 
 The API container then runs with HF_HUB_OFFLINE=1, so it never downloads (or silently
-upgrades) the text encoder at runtime. ml/inference.py is unchanged: it still loads
-"sentence-transformers/LaBSE", which resolves to this cached revision.
+upgrades) the text encoder at runtime. ml/inference.py loads "sentence-transformers/LaBSE"
+at this same pinned revision, which resolves to this cache.
 
 Usage: python fetch_labse.py <cache_dir> <sha256_manifest>
 """

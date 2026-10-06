@@ -5,9 +5,8 @@ scoring videos with a machine-learning model trained on those lists. It is a Rea
 dashboard on top of a FastAPI backend and a PostgreSQL database, with user accounts,
 workspaces and roles, and a Docker Compose setup for running the whole thing.
 
-The project started as a Streamlit dashboard plus a model notebook (both still in this
-repository, see [Project evolution](#project-evolution)) and was rebuilt into the
-application described here.
+The project started as a Streamlit dashboard plus a model notebook and was rebuilt into
+the application described here (see [Project evolution](#project-evolution)).
 
 ---
 
@@ -19,7 +18,7 @@ dominate trending in India compared with the US*, *how long do videos stay on th
 or *which channels keep appearing*, you need the history.
 
 This project collects those daily snapshots into PostgreSQL and puts an analytics UI and
-an API on top of them. It also serves a frozen model that estimates how likely a
+an API on top of them. It also serves a model that estimates how likely a
 **video that is already trending** is to be one of the stronger performers in its
 country.
 
@@ -36,8 +35,8 @@ country.
   (histogram, percentiles, per-category spread, views-vs-engagement scatter) and top
   channels.
 - **ML predictions**: enter a video's title, description, tags, channel statistics,
-  duration, category and country and get a `high_performance_probability` with its three
-  component scores.
+  duration, category and country and get a `high_performance_probability` plus the
+  score of the text alone.
 - **Accounts and teams**: sign up (which creates your own workspace), sign in, and, as an
   owner or admin, add teammates and manage their roles.
 
@@ -69,11 +68,11 @@ database:
 
 ```
  Browser form ─▶ POST /api/v1/predictions ─▶ PredictionService (one in-memory model, one call at a time)
-                                              └─▶ ml.TrendingPredictor
-                                                   ├─ LaBSE text embedding  → text logistic regression
-                                                   ├─ channel/duration/category/country → calibrated random forest
-                                                   ├─ title signals         → "psychology" logistic regression
-                                                   └─ stacking logistic regression → high_performance_probability
+                                              └─▶ ml.TrendingPredictor (model/trending_model_v3.joblib)
+                                                   ├─ LaBSE text embedding → text score (logistic regression) + 32 PCA components
+                                                   ├─ channel statistics, duration, category, country
+                                                   ├─ title / description / tag signals
+                                                   └─ gradient boosting on all of the above → high_performance_probability
 ```
 
 In Docker, nginx serves the built frontend and proxies `/api` and `/health` to FastAPI on
@@ -99,10 +98,10 @@ The views keep only the columns the application needs, normalise empty categorie
 `Unknown`, and convert durations to seconds. They are refreshed manually after new data
 is ingested (`REFRESH MATERIALIZED VIEW ...`); nothing refreshes them automatically.
 
-**CSV files.** `dataset_csv_files/` holds CSV exports of the per-country data (tracked with
-Git LFS, ~1.3 GB). Only the legacy Streamlit dashboard reads them. The current application
-reads PostgreSQL exclusively, so analytics always reflect the database, and the database
-is the single place where data is added.
+**Single source of data.** The application and the model training read PostgreSQL only, so
+analytics always reflect the database, and the database is the single place where data is
+added. (Earlier CSV exports of the data are no longer part of the repository; they remain in
+git history.)
 
 In the database this repository was developed against, the data covers 2024-10-12 to
 2026-01-05: 658,761 snapshots of 99,402 distinct videos.
@@ -143,11 +142,11 @@ Other rules:
 ## The prediction model
 
 **What it predicts.** The output is called `high_performance_probability`. The model was
-trained **only on videos that were already on a trending list**. A video was labelled
-high-performing when, at its first trending appearance, its likes and comments were at or
-above its country's median and its views were at or above
-`100,000 × (country median views / India median views)` (see `insert_will_trend.py`, which
-wrote that label as `will_trend`).
+trained **only on videos that were already on a trending list**, one row per video and
+country. A video is labelled high-performing in a country when, at its first trending
+appearance there, its likes and comments are at or above that country's median and its
+views are at or above `100,000 × (country median views / India median views)`. Medians are
+taken over all first trending appearances in each country.
 
 **What it does not predict.** It does not estimate whether an arbitrary video will reach a
 trending list. It scores how likely a video, *if it is trending*, is to be among the higher
@@ -156,30 +155,33 @@ performers in its country. Treat it as a relative indicator.
 **Inputs.** Title, description, tags, channel title, category (name or YouTube category
 ID), country, duration in seconds, channel subscriber count, channel video count and
 channel view count. Supported countries: AU, CA, GB, IE, IN, NZ, US, ZA (Singapore is not
-supported). Supported categories: the 14 the model was trained on (Autos & Vehicles,
-Comedy, Education, Entertainment, Film & Animation, Gaming, Howto & Style, Music, News &
-Politics, People & Blogs, Pets & Animals, Science & Technology, Sports, Travel & Events).
-Anything else is rejected with a clear validation error.
+supported). Supported categories: the 15 in the training data (Autos & Vehicles, Comedy,
+Education, Entertainment, Film & Animation, Gaming, Howto & Style, Music, News & Politics,
+Nonprofits & Activism, People & Blogs, Pets & Animals, Science & Technology, Sports, Travel &
+Events). Anything else is rejected with a clear validation error.
 
-**How it works.** Three sub-models are combined by a logistic regression:
+**How it works (model v3).** One gradient-boosting model looks at all inputs together:
 
-1. **Text**: LaBSE (`sentence-transformers/LaBSE`, multilingual) embeds channel title,
-   title, description and tags; a logistic regression scores the embedding.
-2. **Channel and numeric**: a calibrated random forest on log-scaled channel statistics,
-   duration, channel ratios and one-hot category/country.
-3. **Psychology**: a logistic regression on title signals. Some of these signals are fixed
-   at 0 at inference, exactly as in the original application, so only digits, `?` and `!` in
-   the title change this score.
+- **Text**: LaBSE (`sentence-transformers/LaBSE`, multilingual) embeds channel name, title,
+  description and tags; a logistic regression turns the embedding into a *text score*
+  (also shown on the page), and 32 compressed components of the embedding are used directly.
+- **Channel and video**: log-scaled channel statistics, channel ratios, duration and
+  short-video flags.
+- **Category and country.**
+- **Title/description/tag signals**: keywords, digits, `?` and `!`, lengths, capitals, emoji,
+  hashtags, links, tag count.
 
-The training notebook reports ROC-AUC ≈ 0.894 on a held-out split (computed with the
-uncalibrated forest; the served pipeline has not been separately evaluated).
-`GET /api/v1/predictions/model-info` returns the full description, supported values and
-known limitations.
+**How good it is.** On the newest period of data, never used for training (Dec 2025 – Jan
+2026), it reaches ROC-AUC **0.923**; the previous model scored 0.842 on the same rows. On a
+live check with 397 videos taken straight from YouTube's trending lists, it reached 0.891
+(previous model 0.832). Details, per-country results and the full history are in
+[ml_training/REPORT.md](ml_training/REPORT.md).
 
-**Why it is frozen.** The artifacts in `model/` are served exactly as trained. They are not
-retrained or re-saved, the inference code in `ml/` reproduces the original `predictor.py`
-exactly, and the tests check both (artifact checksums and 25 reference predictions).
-`scikit-learn` is pinned to 1.8.0 because the pickles were created with it.
+**Where it lives.** `model/trending_model_v3.joblib` (one file, checksum-verified by the tests
+and the Docker build), inference code in `ml/`, training code in `ml_training/`. The feature
+code in `ml/features.py` is shared by training and serving, and the tests check that the app
+reproduces 25 reference predictions of the training pipeline. `scikit-learn` is pinned to
+1.8.0 because the model file was saved with it.
 
 ## Accounts, workspaces and roles
 
@@ -291,7 +293,7 @@ schema) and in [PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md#8-api-referen
 
 ```powershell
 python -m pytest backend/tests     # API, auth/RBAC, repositories, database roles, migrations
-python -m pytest tests             # frozen ML: artifact checksums, reference predictions
+python -m pytest tests             # ML: model checksum, reference predictions, validation
 
 cd frontend
 npm run test:run                   # component/page tests (Vitest + Testing Library + MSW)
@@ -306,7 +308,7 @@ The backend tests run against the real development database (with migrations app
 and some assert values from the current dataset; the ML tests load the real model.
 `deploy/smoke_test.py` checks a running Docker stack over HTTP.
 
-At the time of writing: 347 backend tests, 93 ML tests and 169 frontend tests pass.
+At the time of writing: 347 backend tests, 71 ML tests and 169 frontend tests pass.
 
 ## Repository layout
 
@@ -316,25 +318,23 @@ At the time of writing: 347 backend tests, 93 ML tests and 169 frontend tests pa
 | `backend/migrations/` | Numbered SQL migrations (read model, roles, auth schema) |
 | `backend/scripts/migrate.py` | Migration runner (applies migrations, sets role passwords) |
 | `backend/tests/` | Backend tests |
-| `ml/` | Inference package for the frozen model (no Streamlit dependency) |
-| `model/` | Frozen model artifacts and the training notebook |
-| `tests/` | ML tests and fixtures (artifact checksums, reference predictions) |
+| `ml/` | Inference package and feature code for the model (shared with training) |
+| `model/` | The model file `trending_model_v3.joblib` |
+| `ml_training/` | Training, evaluation and live-check scripts, the report and results |
+| `tests/` | ML tests and fixtures (model checksum, reference predictions) |
 | `frontend/` | React + TypeScript app, nginx config and its Dockerfile |
 | `deploy/` | Docker helpers: database tool image, LaBSE pinning, artifact check, smoke test |
 | `docker-compose.yml` | The Docker deployment |
 | `pushing_into_database/` | YouTube Data API ingestion script |
-| `insert_will_trend.py` | Script that wrote the training label (`will_trend`) |
-| `ui/`, `predictor.py` | The original Streamlit dashboard and predictor (legacy, see below) |
-| `dataset_csv_files/` | CSV exports of the trending data (Git LFS; used by the legacy dashboard) |
 
 ## Limitations
 
 - **Data freshness is manual.** Ingestion is a script you run; the materialized views must be
   refreshed afterwards. There is no scheduler.
 - **The prediction is narrow** (see above): already-trending videos only, eight countries,
-  fourteen categories, 2024–2026 training data, some title signals fixed at 0. The stacking
-  model receives calibrated forest scores although it was trained on uncalibrated ones; the
-  model is served as-is.
+  fifteen categories, training data up to December 2025. The share of high performers drifts
+  over time, so probabilities can be too low or too high for a new period (ranking holds up
+  better); periodic retraining is needed. See [ml_training/REPORT.md](ml_training/REPORT.md).
 - **Authentication basics only**: no password reset, email verification, invitations, MFA
   or SSO. Lockout is per account (5 failed attempts → 15 minutes); there is no per-IP rate
   limiting. Self-registration is open by default (`AUTH_REGISTRATION_ENABLED`).
@@ -349,21 +349,22 @@ At the time of writing: 347 backend tests, 93 ML tests and 169 frontend tests pa
 
 Ideas that are **not implemented**: scheduled ingestion and view refresh, password reset
 and email verification, per-IP rate limiting, TLS in the Compose stack, published images
-and CI, and a properly re-evaluated (or retrained) prediction model.
+and CI, scheduled retraining or recalibration of the prediction model.
 
 ## Project evolution
 
 1. **Original project**: daily ingestion from the YouTube API into PostgreSQL, a training
-   notebook (`model/final_model.ipynb`) for the stacked model, and a Streamlit dashboard
-   (`ui/app.py` with `predictor.py`) that read the CSV exports.
-2. **Current application**: the model was extracted unchanged into the `ml/` package, an
-   analytics read model was built in PostgreSQL, a FastAPI backend and a React frontend
-   replaced the Streamlit UI, accounts/workspaces/roles were added, and the stack was
-   containerised.
-
-The Streamlit dashboard (`ui/`, started with `streamlit run ui/app.py`) is kept for
-reference and is no longer maintained. `predictor.py` stays because the ML tests use it as
-the reference the new inference code must match.
+   notebook for a stacked model (three sub-models and a combiner), and a Streamlit dashboard
+   that read the CSV exports.
+2. **Full-stack application**: an analytics read model in PostgreSQL, a FastAPI backend and
+   a React frontend replaced the Streamlit UI; accounts, workspaces and roles were added, and
+   the stack was containerised. The original model was first served unchanged.
+3. **Model v3**: an audit of the original training found several defects (the served random
+   forest had been trained on ~7.5 % of the data, training and serving prepared text
+   differently, most title features did not work). The model was rebuilt and evaluated on the
+   newest data and on live trending lists, and replaced the original one
+   ([ml_training/REPORT.md](ml_training/REPORT.md)). The original notebook, Streamlit
+   dashboard and model files remain in git history.
 
 More detail for developers: **[PROJECT_DOCUMENTATION.md](PROJECT_DOCUMENTATION.md)**.
 Deployment: **[DEPLOYMENT.md](DEPLOYMENT.md)**.

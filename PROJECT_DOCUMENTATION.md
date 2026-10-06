@@ -46,10 +46,10 @@ Three separate concerns share one FastAPI process:
 |---|---|---|---|
 | Analytics (read-only) | `api/routes/{meta,overview,analytics,videos}.py`, `repositories/` | `app.*` views | `yt_app_ro` |
 | Accounts and workspaces | `api/routes/{auth,tenant}.py`, `services/auth.py`, `repositories/auth.py` | `auth.*` tables | `yt_auth_rw` |
-| Predictions | `api/routes/predictions.py`, `services/predictions.py`, `ml/` | `model/*.pkl`, LaBSE | none |
+| Predictions | `api/routes/predictions.py`, `services/predictions.py`, `ml/` | `model/trending_model_v3.joblib`, LaBSE | none |
 
 The PostgreSQL admin credentials (`DB_USER`/`DB_PASSWORD`) are used only by the migration
-runner, the legacy scripts and the Docker `dbtools` container. The API never connects with
+runner, the ingestion and training scripts and the Docker `dbtools` container. The API never connects with
 them (the engines refuse an admin user name), and in Docker it is not even given them.
 
 ### Request lifecycle
@@ -290,28 +290,29 @@ response echoes the filters actually applied.
 
 | Piece | Location |
 |---|---|
-| Inference package | `ml/` (`inference.py` – `TrendingPredictor`; `features.py` – feature construction; `schemas.py` – inputs, validation, category/country resolution) |
-| Artifacts | `model/`: `text_scaler.pkl`, `text_lr.pkl`, `rf_calibrated.pkl`, `psych_scaler.pkl`, `psych_lr.pkl`, `meta_lr.pkl`, `ohe.pkl`, `clip_values.pkl` |
-| Text encoder | `sentence-transformers/LaBSE` from the Hugging Face cache (pinned to revision `836121a0533e5664b21c7aacc5d22951f2b8b25b` in Docker) |
+| Inference package | `ml/` (`inference.py` – `TrendingPredictor`; `features.py` – feature construction, shared with training; `schemas.py` – inputs, validation, category/country resolution) |
+| Model file | `model/trending_model_v3.joblib`: text logistic regression (with scaler), PCA (32 components), gradient-boosting model, clip values, column order and category lists |
+| Text encoder | `sentence-transformers/LaBSE`, revision `836121a0533e5664b21c7aacc5d22951f2b8b25b` (pinned in `ml/inference.py` and in the Docker image) |
 | API wrapper | `backend/app/services/predictions.py` |
-| Training notebook | `model/final_model.ipynb` (history; not used at runtime) |
-| Legacy reference | `predictor.py` (original Streamlit predictor; used only by tests and `ui/`) |
+| Training and evaluation | `ml_training/` (`train_v3.py`, `make_reference.py`, `compare_v1.py`, `live_test.py`; report in `ml_training/REPORT.md`) |
 
-### Pipeline
+### Pipeline (one request)
 
 1. Validate and resolve category (name, case-insensitive, or YouTube category id) and
-   country against the values in the saved one-hot encoder. Unsupported values raise
+   country against the values in the training data. Unsupported values raise
    `InvalidInputError` → 422 `invalid_prediction_input` with per-field details.
-2. **Text score**: LaBSE embedding of channel title + title + description + tags →
-   `text_scaler` → `text_lr`.
-3. **Channel/numeric score**: one-hot(category, country) + 8 numeric features
-   (log duration, log subscribers, log channel views, channel authority, views per video
-   and subscribers per video (clipped with `clip_values.pkl`), legacy-channel flag, video
-   volume bucket) → `rf_calibrated`.
-4. **Psychology score**: 8 title features → `psych_scaler` → `psych_lr`. The urgency, hype,
-   official-word and emotion flags and the title–description overlap are constant 0, as in
-   the original application; only digits, `?` and `!` vary.
-5. **Final**: `meta_lr` on the three scores → `high_performance_probability`.
+2. **Text**: `build_text` = cleaned channel name + title + description + tags → LaBSE
+   embedding (first 256 tokens) → text logistic regression = **text score**; the same
+   embedding → 32 PCA components.
+3. **Feature table** (`model_table`): 8 channel/duration features (log duration, log
+   subscribers, log channel views, channel authority, clipped views/subscribers per video,
+   legacy-channel flag, video-volume bucket) + video count, views per subscriber, short-video
+   flags; title/description/tag signals (whole-word keywords, digits, `?`, `!`, lengths,
+   capitals, non-Latin script, emoji, hashtags, links, tag count, "shorts", overlap);
+   category and country as categoricals; the text score (as logit) and the 32 components.
+4. **Gradient boosting** on that table → `high_performance_probability`.
+
+The response contains the probability and the text score (`components.text`).
 
 ### Lifecycle
 
@@ -319,23 +320,24 @@ response echoes the filters actually applied.
   (otherwise on first use). A load failure is logged and reported as `failed`; prediction
   endpoints then return 503 `model_unavailable` while the rest of the API keeps working.
 - A lock serialises loading and inference: one prediction at a time per process.
-- `version` = short hash of the `.pkl` files' SHA-256s, returned with each prediction.
+- `version` = first 12 hex digits of the model file's SHA-256, returned with each prediction.
 - Nothing is stored; predictions are not logged with their inputs.
+- `ML_ARTIFACT_PATH` overrides the model file location.
 
 ### Meaning
 
 From `services/predictions.py` (the text the API returns):
 
-- **Label**: trained only on videos already on a trending list; high-performing when, at its
-  first trending appearance, likes and comments ≥ the country median and views ≥
-  100,000 × (country median views / India median views).
+- **Label**: trained only on videos already on a trending list, one row per video and country;
+  high-performing in a country when, at its first trending appearance there, likes and
+  comments ≥ that country's median and views ≥ 100,000 × (country median views / India median
+  views); medians over all first trending appearances in each country.
 - **Not a prediction of** whether an arbitrary video will reach a trending list.
-- Training data: trending videos from AU, CA, GB, IE, IN, NZ, US and ZA, 2024-10-12 to
-  2026-01-05, one row per video.
-- Reported ROC-AUC 0.894 (training notebook, held-out split, uncalibrated forest).
-- Known quirks served as-is: the stacker was trained on uncalibrated forest scores but
-  receives calibrated ones; the random forest evaluates trees in parallel, so repeated
-  predictions can differ at ~1e-16.
+- Training data: AU, CA, GB, IE, IN, NZ, US and ZA, 2024-10-12 to 2025-12-02.
+- ROC-AUC 0.923 on the newest held-out period (2025-12-03 to 2026-01-05; previous model 0.842 on
+  the same rows) and 0.891 on a live check of 397 trending videos (previous model 0.832).
+- The share of high performers drifts over time, so probabilities can be off for a new period;
+  ranking holds up better. Retrain periodically (`ml_training/REPORT.md`, "Retraining").
 
 ---
 
@@ -442,7 +444,7 @@ All configuration is environment variables, read from the process environment or
 | Variable | Default | Used by | Purpose |
 |---|---|---|---|
 | `DB_HOST`, `DB_PORT`, `DB_NAME` | `localhost`, `5432`, – | all | Database location |
-| `DB_USER`, `DB_PASSWORD` | `postgres`, – | migrations, legacy scripts, `dbtools` | Admin account (never the API) |
+| `DB_USER`, `DB_PASSWORD` | `postgres`, – | migrations, ingestion, `ml_training`, `dbtools` | Admin account (never the API) |
 | `DB_APP_RO_USER`, `DB_APP_RO_PASSWORD` | –, – | API | Read-only analytics role (`yt_app_ro`) |
 | `DB_AUTH_USER`, `DB_AUTH_PASSWORD` | –, – | API | Auth role (`yt_auth_rw`) |
 | `AUTH_SECRET_KEY` | – (required) | API | HMAC key for session tokens, ≥ 32 characters; the API refuses to start without it. Changing it signs everyone out. |
@@ -454,10 +456,10 @@ All configuration is environment variables, read from the process environment or
 | `CORS_ORIGINS` | `http://localhost:5173` | API | Comma-separated explicit origins |
 | `API_DOCS_ENABLED` | dev only | API | `/docs`, `/redoc`, `/openapi.json` |
 | `ML_ENABLED`, `ML_PRELOAD` | true, true | API | Serve predictions / load model at startup |
-| `ML_ARTIFACT_DIR` | `model/` | `ml/` | Artifact directory override |
+| `ML_ARTIFACT_PATH` | `model/trending_model_v3.joblib` | `ml/` | Model file override |
 | `MAX_REQUEST_BYTES` | 65536 | API | Request body limit |
 | `PSQL_PATH` | `psql` on PATH | `migrate.py` | psql location |
-| `YOUTUBE_API_KEY` | – | ingestion script | YouTube Data API key |
+| `YOUTUBE_API_KEY` | – | ingestion script, `ml_training/live_test.py` | YouTube Data API key |
 | `PUBLIC_ORIGIN`, `WEB_BIND`, `WEB_PORT`, `API_MEM_LIMIT` | see `.env.example` | Docker Compose | Deployment settings |
 | `VITE_API_BASE_URL` | `http://localhost:8000` | frontend build | API base URL (public!) |
 
@@ -470,7 +472,7 @@ Full instructions: [DEPLOYMENT.md](DEPLOYMENT.md). Summary of the design:
 | Service | Image | Notes |
 |---|---|---|
 | `web` | `frontend/Dockerfile` (Node build → `nginxinc/nginx-unprivileged`) | The only published port (`127.0.0.1:8080` by default). Serves the SPA (fallback to `index.html`), proxies `/api` and `/health`. Hashed assets cached for a year, `index.html` `no-cache`, API responses `no-store`. Security headers including a Content-Security-Policy. Config: `frontend/nginx.conf`. |
-| `api` | `backend/Dockerfile` | Python 3.14 slim, packages from `backend/requirements-api.lock` (CPU-only PyTorch), LaBSE pinned and checksum-verified (`deploy/labse/`), only the 8 `.pkl` files, verified against `tests/fixtures/artifact_sha256.json` at build time. Offline Hugging Face mode. One uvicorn worker, non-root (uid 10001), read-only filesystem. Health check: readiness. |
+| `api` | `backend/Dockerfile` | Python 3.14 slim, packages from `backend/requirements-api.lock` (CPU-only PyTorch), LaBSE pinned and checksum-verified (`deploy/labse/`), only `model/trending_model_v3.joblib`, verified against `tests/fixtures/artifact_sha256.json` at build time. Offline Hugging Face mode. One uvicorn worker, non-root (uid 10001), read-only filesystem. Health check: readiness. |
 | `db` | `postgres:18-alpine` | Data in the named volume `pgdata`; not published. |
 | `dbtools` | `deploy/dbtools/Dockerfile` | One-off (`--profile tools`): `seed` (restores the 9 raw tables from `deploy/seed/raw_tables.dump`, refuses if they exist), `migrate`, `status`. The only container that gets the admin password. |
 
@@ -495,7 +497,7 @@ in front of `web` and set `PUBLIC_ORIGIN` accordingly.
 | Suite | Command | Needs | Covers |
 |---|---|---|---|
 | Backend | `python -m pytest backend/tests` | dev database with migrations applied and role passwords set; `.env` | repositories against the real data (`test_*_repository.py`), query strategy equivalence, database roles and privileges (`test_db_foundation.py`), API unit tests with mocked repositories (`api/test_api_unit.py`), API vs repository equality (`api/test_api_integration.py`), predictions through the API (`api/test_api_predictions.py`), auth/RBAC/workspace isolation/CSRF against the real database (`api/test_auth_integration.py`), auth unit tests |
-| ML | `python -m pytest tests` | LaBSE in the Hugging Face cache (or internet) | artifact checksums for every file in `model/`, `ml/` never writes artifacts, feature dimensions, equality with the legacy `predictor.py` and 25 stored reference predictions |
+| ML | `python -m pytest tests` | LaBSE in the Hugging Face cache (or internet) | the model file checksum, `ml/` never writes or fits, feature table = model columns, 25 reference predictions produced by the training pipeline, feature behaviour (`?`/`!`, whole-word keywords), input validation |
 | Frontend | `npm run test:run` (in `frontend/`) | nothing external (MSW mocks the API) | routing, auth flows, protected routes, role-aware navigation, pages, filters, query keys, client and error handling |
 | Static checks | `npm run lint`, `typecheck`, `format:check`, `api:check`, `build` | – | – |
 | Docker smoke | `python deploy/smoke_test.py [--base URL]` | a running stack | real HTTP through nginx: headers, health, auth, analytics, the 25 reference predictions, RBAC, isolation, CSRF, logout |
@@ -515,8 +517,9 @@ afterwards (using the admin connection, in tests only).
   no token is reachable from JavaScript.
 - **Global data, per-workspace people.** The dataset is not copied per tenant; isolation
   applies to users and memberships.
-- **Frozen model, wrapped not rewritten.** `ml/` copies the legacy inference behaviour,
-  including its quirks, and tests prove equality with `predictor.py`.
+- **One feature definition.** `ml/features.py` is used by training and serving, and the tests
+  prove the app reproduces the training pipeline's predictions (the original model's training
+  and serving code had drifted apart).
 - **Same-origin deployment.** Avoids cross-site cookie and CORS issues.
 - **Errors never leak internals.** The envelope carries a code, a user-facing message and a
   request id; details go to the server log.
@@ -527,9 +530,8 @@ afterwards (using the admin connection, in tests only).
 
 | Area | Why |
 |---|---|
-| `model/` (every file, including the notebook, `README.md` and `urgency_words.txt`) | The ML tests check the checksum of every file in the folder. The `.pkl` files were pickled with scikit-learn 1.8.0. |
-| `ml/features.py`, `ml/inference.py` | They must reproduce `predictor.py` exactly. "Fixing" a difference from the training notebook changes every prediction. |
-| `predictor.py` | Reference implementation for the ML tests. |
+| `model/trending_model_v3.joblib` | The evaluated model; its checksum is checked by the tests and the Docker build. Saved with scikit-learn 1.8.0. Replace only via `ml_training/` (retrain, `make_reference.py`, update the checksum). |
+| `ml/features.py` | Shared by training and serving; any change changes every prediction and requires retraining. |
 | LaBSE revision (`deploy/labse/`) | A different revision changes the text embeddings. |
 | The prediction wording (`LABEL_DEFINITION`, `NOT_A_PREDICTION_OF`) | It describes what the model can and cannot say. |
 | Applied migrations (`backend/migrations/001`–`006`) | `migrate.py` refuses to run when an applied file changes. Add a new numbered migration instead. |
@@ -548,8 +550,8 @@ afterwards (using the admin connection, in tests only).
 **Data**: manual ingestion (50 videos per country per run) and manual view refresh; tests
 are tied to the current dataset.
 
-**Model**: see section 6 (narrow label, 8 countries, 14 categories, fixed title signals,
-calibration mismatch, 2024–2026 distribution).
+**Model**: see section 6 (already-trending videos only, 8 countries, 15 categories, label
+drift over time, 256-token text limit, no scheduled retraining).
 
 **Authentication**: no password reset, email verification, invitations, MFA or SSO;
 account lockout only (no per-IP limiting), and the lockout response reveals that an account
@@ -561,5 +563,6 @@ images are not published and base images are pinned by tag, not digest; no autom
 backups or monitoring; one API container.
 
 **History**: an older committed version of `pushing_into_database/data_ingestion_api_v3.py`
-contained a YouTube API key. The current file reads the key from the environment. Git
-history was not rewritten, so that key should be considered exposed and revoked.
+contained a YouTube API key. That key has been deleted in Google Cloud, so the copy in git
+history (which was not rewritten) no longer works. The current file reads the key from the
+environment (`YOUTUBE_API_KEY` in `.env`, which is git-ignored).

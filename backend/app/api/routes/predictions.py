@@ -1,4 +1,4 @@
-"""Prediction endpoints (frozen ML model via services/predictions.py)."""
+"""Prediction endpoints (ML model v3 via services/predictions.py)."""
 
 from fastapi import APIRouter
 

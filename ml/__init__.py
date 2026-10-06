@@ -1,4 +1,4 @@
-"""Frozen YouTube trending model: standalone inference layer (no Streamlit)."""
+"""YouTube trending model (v3): inference layer used by the API."""
 
 from .inference import TrendingPredictor
 from .schemas import InvalidInputError, PredictionInput, PredictionResult

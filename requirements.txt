@@ -1,16 +1,12 @@
 # Core data / ML
 numpy
 pandas
-# Pinned: model/*.pkl artifacts were pickled with scikit-learn 1.8.0
+# Pinned: model/trending_model_v3.joblib was saved with scikit-learn 1.8.0
 scikit-learn==1.8.0
 joblib
 sentence-transformers
 torch
 transformers
-
-# Streamlit dashboard (ui/)
-streamlit
-plotly
 
 # Database
 sqlalchemy

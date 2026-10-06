@@ -466,7 +466,7 @@ export function errorEnvelope(
 
 export const modelInfoResponse = {
   data: {
-    name: 'YouTube trending high-performance model (frozen)',
+    name: 'YouTube trending high-performance model (v3)',
     version: '8c2a4a05c1f6',
     output: 'high_performance_probability',
     label_definition:
@@ -478,13 +478,11 @@ export const modelInfoResponse = {
     supported_categories: ['Gaming', 'Music', 'Sports'],
     category_input: 'Category name (case-insensitive) or YouTube category ID.',
     components: {
-      text: 'Text sub-model description.',
-      channel_and_numeric: 'Channel sub-model description.',
-      psychology: 'Title-signal sub-model description.',
-      high_performance_probability: 'Combination of the three component scores.',
+      text: 'Text score description.',
+      high_performance_probability: 'Gradient-boosting model description.',
     },
-    reported_metrics: { roc_auc: '0.894', note: 'Reported on the training notebook split.' },
-    limitations: ['Singapore (SG) is not supported.', 'Some title signals are fixed at 0.'],
+    reported_metrics: { roc_auc: '0.923', note: 'Measured on the newest held-out period.' },
+    limitations: ['Singapore (SG) is not supported.', 'Scores are relative indicators.'],
   },
 } satisfies ApiResponse<'/api/v1/predictions/model-info'>;
 
@@ -492,7 +490,7 @@ export function predictionResponse(probability = 0.938877798492448) {
   return {
     data: {
       high_performance_probability: probability,
-      components: { text: 0.8145, channel_and_numeric: 0.8209, psychology: 0.5634 },
+      components: { text: 0.8145 },
       inputs_used: { category: 'Sports', country: 'IN' },
       model: { version: '8c2a4a05c1f6', label_definition: 'Label definition from the API.' },
     },

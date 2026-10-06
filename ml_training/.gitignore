@@ -1,0 +1,5 @@
+# Local-only training outputs (large or machine-specific)
+.venv/
+cache/
+logs/
+artifacts/

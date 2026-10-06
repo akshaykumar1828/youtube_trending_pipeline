@@ -1585,26 +1585,14 @@
       },
       "PredictionComponents": {
         "properties": {
-          "channel_and_numeric": {
-            "description": "Channel statistics, duration, category and country sub-model.",
-            "title": "Channel And Numeric",
-            "type": "number"
-          },
-          "psychology": {
-            "description": "Title-signal sub-model (see model-info limitations).",
-            "title": "Psychology",
-            "type": "number"
-          },
           "text": {
-            "description": "Text sub-model (LaBSE embedding of channel, title, description, tags).",
+            "description": "Text score: probability from the text alone (LaBSE embedding of channel name, title, description and tags). One of the inputs of the final model.",
             "title": "Text",
             "type": "number"
           }
         },
         "required": [
-          "text",
-          "channel_and_numeric",
-          "psychology"
+          "text"
         ],
         "title": "PredictionComponents",
         "type": "object"
@@ -2482,7 +2470,7 @@
     }
   },
   "info": {
-    "description": "\nRead-only analytics API over YouTube trending snapshots (PostgreSQL `app` schema) and a frozen ML model.\n\n**Metric semantics**\n* *Latest snapshot* = each video's latest snapshot **within the filtered dataset** (date range,\n  countries, categories), not its globally latest snapshot.\n* **Snapshot-level** metrics count trending appearances (country x video x day), e.g. trending volume.\n* **Video-level** metrics count each video once via its latest filtered snapshot, e.g. unique videos,\n  views, engagement rate.\n* **Country-level** metrics use each video's latest filtered snapshot in that country. Country\n  `views_of_trending_videos` are **global lifetime views** of videos that trended there; they are\n  **not additive** across countries.\n* View counts are lifetime totals: historical snapshots are **never summed** for views.\n* Period change: counts and views in **percent**; engagement rate in **percentage points**.\n\n**Authentication**: sign in via `/api/v1/auth/login` (or register). The session is an HttpOnly\ncookie; every `/api/v1` endpoint except register/login requires it. Analytics endpoints need\n`VIEW_ANALYTICS`, predictions `MAKE_PREDICTION`, member management `MANAGE_USERS`. The YouTube\ndataset is global and read-only; workspaces (tenants) own only their users and memberships.\nHealth probes are public.\n",
+    "description": "\nRead-only analytics API over YouTube trending snapshots (PostgreSQL `app` schema) and an ML model.\n\n**Metric semantics**\n* *Latest snapshot* = each video's latest snapshot **within the filtered dataset** (date range,\n  countries, categories), not its globally latest snapshot.\n* **Snapshot-level** metrics count trending appearances (country x video x day), e.g. trending volume.\n* **Video-level** metrics count each video once via its latest filtered snapshot, e.g. unique videos,\n  views, engagement rate.\n* **Country-level** metrics use each video's latest filtered snapshot in that country. Country\n  `views_of_trending_videos` are **global lifetime views** of videos that trended there; they are\n  **not additive** across countries.\n* View counts are lifetime totals: historical snapshots are **never summed** for views.\n* Period change: counts and views in **percent**; engagement rate in **percentage points**.\n\n**Authentication**: sign in via `/api/v1/auth/login` (or register). The session is an HttpOnly\ncookie; every `/api/v1` endpoint except register/login requires it. Analytics endpoints need\n`VIEW_ANALYTICS`, predictions `MAKE_PREDICTION`, member management `MANAGE_USERS`. The YouTube\ndataset is global and read-only; workspaces (tenants) own only their users and memberships.\nHealth probes are public.\n",
     "title": "YouTube Trending Intelligence API",
     "version": "1.0.0"
   },

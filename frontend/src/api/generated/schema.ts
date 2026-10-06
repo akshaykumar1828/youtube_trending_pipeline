@@ -1011,18 +1011,8 @@ export interface components {
         /** PredictionComponents */
         PredictionComponents: {
             /**
-             * Channel And Numeric
-             * @description Channel statistics, duration, category and country sub-model.
-             */
-            channel_and_numeric: number;
-            /**
-             * Psychology
-             * @description Title-signal sub-model (see model-info limitations).
-             */
-            psychology: number;
-            /**
              * Text
-             * @description Text sub-model (LaBSE embedding of channel, title, description, tags).
+             * @description Text score: probability from the text alone (LaBSE embedding of channel name, title, description and tags). One of the inputs of the final model.
              */
             text: number;
         };

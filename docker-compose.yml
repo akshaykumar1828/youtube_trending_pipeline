@@ -1,6 +1,6 @@
 # YouTube Trending Intelligence: production-style local deployment.
 #
-#   browser ──HTTP──▶ web (nginx: SPA + /api proxy, one origin) ──▶ api (FastAPI + frozen ML)
+#   browser ──HTTP──▶ web (nginx: SPA + /api proxy, one origin) ──▶ api (FastAPI + ML model)
 #                                                                     │
 #                                                                     ▼
 #                                                                 db (PostgreSQL 18)

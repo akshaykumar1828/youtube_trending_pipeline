@@ -4,7 +4,7 @@
 !backend/app/**
 !backend/requirements-api.lock
 !ml/**
-!model/*.pkl
+!model/trending_model_v3.joblib
 !deploy/labse/**
 !deploy/verify_artifacts.py
 !tests/fixtures/artifact_sha256.json

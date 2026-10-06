@@ -1,12 +1,12 @@
-"""Input/output types and input validation for the frozen trending model.
+"""Input/output types and input validation for the trending model.
 
-Validation and the category-ID adapter run BEFORE the model. They never change
-the saved encoder or model; they only reject inputs the model was not trained
-on, or translate a YouTube category ID into the category name the encoder expects.
+Validation and the category-ID adapter run BEFORE the model. They only reject inputs
+the model was not trained on, or translate a YouTube category ID into the category
+name the model expects.
 """
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from numbers import Real
 
 
@@ -30,7 +30,7 @@ YOUTUBE_CATEGORY_IDS = {
     "29": "Nonprofits & Activism",
 }
 
-# Encoder category created from missing training data; not a valid user input.
+# Category used in the training data for videos without one; not a valid user input.
 MISSING_DATA_CATEGORY = "None"
 
 TEXT_FIELDS = ("video_title", "video_description", "video_tags", "channel_title")
@@ -43,7 +43,7 @@ NUMERIC_FIELDS = (
 
 
 class InvalidInputError(ValueError):
-    """Raised when a prediction input is not supported by the frozen model."""
+    """Raised when a prediction input is not supported by the model."""
 
     def __init__(self, errors):
         self.errors = errors  # list of {"field": str, "message": str}
@@ -63,41 +63,13 @@ class PredictionInput:
     video_tags: str = ""
     channel_title: str = ""
 
-    @classmethod
-    def from_legacy_dict(cls, data):
-        """Build from the dict format accepted by the legacy predict_trending()."""
-        return cls(
-            category=data["video_category_id"],
-            country=data["country"],
-            video_duration_sec=data["video_duration_sec"],
-            channel_subscriber_count=data["channel_subscriber_count"],
-            channel_video_count=data["channel_video_count"],
-            channel_view_count=data["channel_view_count"],
-            video_title=data.get("video_title", ""),
-            video_description=data.get("video_description", ""),
-            video_tags=data.get("video_tags", ""),
-            channel_title=data.get("channel_title", ""),
-        )
-
 
 @dataclass
 class PredictionResult:
-    final_probability: float
-    text_score: float
-    numeric_score: float
-    psychology_score: float
-    category: str  # category name actually sent to the encoder
+    final_probability: float  # high_performance_probability
+    text_score: float         # text model's probability from title, description, tags and channel name
+    category: str             # category name actually used by the model
     country: str
-    features: dict = field(default_factory=dict)
-
-    def to_legacy_dict(self):
-        """Same keys and rounding as the legacy predict_trending() return value."""
-        return {
-            "final_probability": round(self.final_probability, 4),
-            "text_score": round(self.text_score, 4),
-            "numeric_score": round(self.numeric_score, 4),
-            "psychology_score": round(self.psychology_score, 4),
-        }
 
 
 def resolve_category(value, supported_categories):

@@ -49,7 +49,7 @@ export function PredictionsPage() {
     <>
       <PageHeader
         title="ML predictions"
-        description="Score how likely a trending video is to be a high performer, using the frozen model served by the API."
+        description="Score how likely a trending video is to be a high performer, using the model served by the API."
       />
       <p className="flex items-start gap-2 rounded-md border border-accent-200 bg-accent-50 px-3 py-2.5 text-sm text-slate-700">
         <Info aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-accent-600" />

@@ -1,103 +1,73 @@
-"""Standalone inference for the frozen YouTube trending model.
+"""Inference for the YouTube trending model (v3).
 
-Reproduces the legacy predictor.py pipeline without any Streamlit dependency.
-Artifacts are only ever read (joblib.load); they are never refit or re-saved.
+One gradient-boosting model scores a video in a given country from channel statistics,
+duration, category, country, title/description/tag signals and the text (LaBSE embedding:
+a logistic-regression text score plus 32 PCA components). Training code and evaluation:
+ml_training/ (see ml_training/REPORT.md). The artifact is only read, never re-saved.
 """
 
 import os
 from pathlib import Path
 
 import joblib
-import numpy as np
+import pandas as pd
 
 from . import features
 from .schemas import MISSING_DATA_CATEGORY, PredictionInput, PredictionResult, validate
 
-
-DEFAULT_ARTIFACT_DIR = Path(__file__).resolve().parent.parent / "model"
+DEFAULT_ARTIFACT = Path(__file__).resolve().parent.parent / "model" / "trending_model_v3.joblib"
 LABSE_MODEL = "sentence-transformers/LaBSE"
+LABSE_REVISION = "836121a0533e5664b21c7aacc5d22951f2b8b25b"
 
 
 class TrendingPredictor:
-    """Loads the frozen model artifacts and LaBSE once; call predict() per video."""
+    """Loads the model artifact and LaBSE once; call predict() per video."""
 
-    def __init__(self, artifact_dir=None, device="cpu"):
+    def __init__(self, artifact_path=None, device="cpu"):
         # Imported here so `import ml` stays light (no torch) until a predictor is built.
         from sentence_transformers import SentenceTransformer
 
-        artifact_dir = Path(artifact_dir or os.getenv("ML_ARTIFACT_DIR") or DEFAULT_ARTIFACT_DIR)
-        self.artifact_dir = artifact_dir
+        path = Path(artifact_path or os.getenv("ML_ARTIFACT_PATH") or DEFAULT_ARTIFACT)
+        self.artifact_path = path
+        model = joblib.load(path)
+        self.text_model = model["text_model"]
+        self.pca = model["pca"]
+        self.gbm = model["gbm"]
+        self.vpv_clip, self.spv_clip = model["clips"]
+        self.columns = model["columns"]
+        self.categories = model["categories"]
+        self.trained_until = model["trained_until"]
 
-        self.embedder = SentenceTransformer(LABSE_MODEL, device=device)
+        self.embedder = SentenceTransformer(LABSE_MODEL, device=device, revision=LABSE_REVISION)
 
-        self.text_scaler = joblib.load(artifact_dir / "text_scaler.pkl")
-        self.text_lr = joblib.load(artifact_dir / "text_lr.pkl")
-        self.rf_calibrated = joblib.load(artifact_dir / "rf_calibrated.pkl")
-        self.psych_scaler = joblib.load(artifact_dir / "psych_scaler.pkl")
-        self.psych_lr = joblib.load(artifact_dir / "psych_lr.pkl")
-        self.meta_lr = joblib.load(artifact_dir / "meta_lr.pkl")
-        self.ohe = joblib.load(artifact_dir / "ohe.pkl")
-
-        clip_values = joblib.load(artifact_dir / "clip_values.pkl")
-        self.vpv_clip = clip_values["vpv_clip"]
-        self.spv_clip = clip_values["spv_clip"]
-
-        # Supported values come from the saved encoder, not a hand-written list.
-        categories, countries = self.ohe.categories_
-        self.supported_categories = tuple(c for c in categories if c != MISSING_DATA_CATEGORY)
-        self.supported_countries = tuple(countries)
+        # Supported values come from the training data, not a hand-written list.
+        self.supported_categories = tuple(c for c in self.categories["video_category_id"]
+                                          if c != MISSING_DATA_CATEGORY)
+        self.supported_countries = tuple(self.categories["country"])
 
     def predict(self, data: PredictionInput) -> PredictionResult:
         category, country = validate(data, self.supported_categories, self.supported_countries)
+        row = pd.DataFrame([{
+            "video_title": data.video_title, "video_description": data.video_description,
+            "video_tags": data.video_tags, "channel_title": data.channel_title,
+            "video_category_id": category, "country": country,
+            "video_duration_sec": float(data.video_duration_sec),
+            "channel_subscriber_count": float(data.channel_subscriber_count),
+            "channel_video_count": float(data.channel_video_count),
+            "channel_view_count": float(data.channel_view_count),
+        }])
 
-        # -----------------------
-        # TEXT MODEL
-        # -----------------------
-        combined_text = features.build_text(
-            data.channel_title, data.video_title, data.video_description, data.video_tags
-        )
-        text_emb = self.embedder.encode([combined_text], convert_to_numpy=True)
-        text_emb = self.text_scaler.transform(text_emb)
-        text_prob = self.text_lr.predict_proba(text_emb)[:, 1][0]
-
-        # -----------------------
-        # NUMERIC + CATEGORICAL MODEL
-        # -----------------------
-        num_features = features.numeric_features(
-            data.video_duration_sec,
-            data.channel_subscriber_count,
-            data.channel_video_count,
-            data.channel_view_count,
-            self.vpv_clip,
-            self.spv_clip,
-        )
-        cat_feature = self.ohe.transform(features.categorical_frame(category, country))
-        rf_input = np.hstack([cat_feature, num_features])
-        rf_prob = self.rf_calibrated.predict_proba(rf_input)[:, 1][0]
-
-        # -----------------------
-        # PSYCHOLOGY MODEL
-        # -----------------------
-        psych_raw = features.psych_features(data.video_title)
-        psych_scaled = self.psych_scaler.transform(psych_raw)
-        psych_prob = self.psych_lr.predict_proba(psych_scaled)[:, 1][0]
-
-        # -----------------------
-        # META STACKING MODEL
-        # -----------------------
-        final_prob = self.meta_lr.predict_proba(
-            np.array([[text_prob, rf_prob, psych_prob]])
-        )[:, 1][0]
+        embedding = self.embedder.encode(features.texts(row), convert_to_numpy=True, show_progress_bar=False)
+        text_probability = self.text_model.predict_proba(embedding)[:, 1]
+        table = features.model_table(row, self.vpv_clip, self.spv_clip, text_probability,
+                                     self.pca.transform(embedding))
+        for column, cats in self.categories.items():
+            table[column] = pd.Categorical(table[column].astype(str), categories=cats)
+        probability = self.gbm.predict_proba(table[self.columns])[:, 1][0]
 
         return PredictionResult(
-            final_probability=float(final_prob),
-            text_score=float(text_prob),
-            numeric_score=float(rf_prob),
-            psychology_score=float(psych_prob),
+            final_probability=float(probability),
+            text_score=float(text_probability[0]),
             category=category,
             country=country,
-            features={
-                "numeric": dict(zip(features.NUMERIC_FEATURES, num_features[0].tolist())),
-                "psychology": dict(zip(features.PSYCH_FEATURES, psych_raw[0].tolist())),
-            },
         )

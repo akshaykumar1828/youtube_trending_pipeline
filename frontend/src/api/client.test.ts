@@ -118,7 +118,7 @@ describe('callApi: successful typed requests', () => {
         return HttpResponse.json({
           data: {
             high_performance_probability: 0.93,
-            components: { text: 0.81, channel_and_numeric: 0.82, psychology: 0.56 },
+            components: { text: 0.81 },
             inputs_used: { category: 'Sports', country: 'IN' },
             model: { version: '8c2a4a05c1f6', label_definition: 'definition' },
           },

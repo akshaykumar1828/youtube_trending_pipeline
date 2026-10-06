@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 #
-# FastAPI + frozen ML model. Build from the repository root:
+# FastAPI + the ML model (v3). Build from the repository root:
 #   docker compose build api        (or: docker build -f backend/Dockerfile .)
 #
 # Layers are ordered by how rarely they change: Python packages (~1 GB) and the LaBSE text
@@ -25,9 +25,9 @@ COPY deploy/labse/ /tmp/labse/
 RUN python /tmp/labse/fetch_labse.py /opt/hf/hub /tmp/labse/labse.sha256
 
 # ---------------------------------------------------------------------------------------------
-# 3. Frozen model artifacts: only the 8 files inference loads, verified byte-for-byte.
+# 3. The model file (model/trending_model_v3.joblib), verified byte-for-byte.
 FROM ${PYTHON_IMAGE} AS artifacts
-COPY model/*.pkl /opt/model/
+COPY model/trending_model_v3.joblib /opt/model/
 COPY tests/fixtures/artifact_sha256.json deploy/verify_artifacts.py /tmp/
 RUN python /tmp/verify_artifacts.py /opt/model /tmp/artifact_sha256.json
 
@@ -46,7 +46,7 @@ ENV PATH=/opt/venv/bin:$PATH \
     PYTHONPATH=/srv/backend:/srv \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    ML_ARTIFACT_DIR=/srv/model \
+    ML_ARTIFACT_PATH=/srv/model/trending_model_v3.joblib \
     HF_HOME=/opt/hf \
     HF_HUB_CACHE=/opt/hf/hub \
     HF_HUB_OFFLINE=1 \

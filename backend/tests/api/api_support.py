@@ -7,7 +7,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 BACKEND = REPO_ROOT / "backend"
-for p in (str(BACKEND), str(REPO_ROOT)):  # backend/app and the frozen ml/ package
+for p in (str(BACKEND), str(REPO_ROOT)):  # backend/app and the ml/ package
     if p not in sys.path:
         sys.path.insert(0, p)
 

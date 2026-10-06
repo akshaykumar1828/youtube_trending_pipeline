@@ -2,7 +2,7 @@
 
 API validation here covers only types, lengths and bounds. Model-specific input
 normalization (category ID -> name, case-insensitive matching, supported countries and
-categories) stays in the frozen ml/ package and its errors are returned as 422.
+categories) stays in the ml/ package and its errors are returned as 422.
 """
 
 from typing import Annotated
@@ -31,9 +31,8 @@ class PredictionRequest(BaseModel):
 
 
 class PredictionComponents(BaseModel):
-    text: float = Field(description="Text sub-model (LaBSE embedding of channel, title, description, tags).")
-    channel_and_numeric: float = Field(description="Channel statistics, duration, category and country sub-model.")
-    psychology: float = Field(description="Title-signal sub-model (see model-info limitations).")
+    text: float = Field(description="Text score: probability from the text alone (LaBSE embedding of channel name, "
+                                    "title, description and tags). One of the inputs of the final model.")
 
 
 class PredictionInputsUsed(BaseModel):

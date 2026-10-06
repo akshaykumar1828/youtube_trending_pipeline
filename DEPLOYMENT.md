@@ -4,7 +4,7 @@
 browser ──▶ web  (nginx :8080)  ── /         → built React app (static, SPA fallback)
                                 ── /api/*    → api
                                 ── /health/* → api
-            api  (FastAPI + frozen ML model, 1 uvicorn worker)  ──▶  db (PostgreSQL 18)
+            api  (FastAPI + ML model v3, 1 uvicorn worker)  ──▶  db (PostgreSQL 18)
 ```
 
 * **One origin** for the app and the API, so the session cookie (HttpOnly, Secure,
@@ -53,9 +53,9 @@ docker compose --profile tools build
 ```
 
 The API image installs the pinned packages in `backend/requirements-api.lock` (CPU-only
-PyTorch) and contains the exact LaBSE revision and the 8 frozen model files, each verified
-against checksums during the build (`deploy/labse/labse.sha256`,
-`tests/fixtures/artifact_sha256.json`); a mismatch fails the build. The first build downloads
+PyTorch) and contains the exact LaBSE revision and the model file
+`model/trending_model_v3.joblib`, each verified against checksums during the build
+(`deploy/labse/labse.sha256`, `tests/fixtures/artifact_sha256.json`); a mismatch fails the build. The first build downloads
 ~3 GB; later code-only changes rebuild in seconds.
 
 ## 3. Seed the database (once per new volume)
@@ -143,7 +143,7 @@ compiled into the browser bundle, so never put secrets in them.
   `AUTH_COOKIE_SECURE=true`, and add HSTS there. Preserve the `Host` header; the API's CSRF
   check compares `Origin` with it.
 * **ML memory:** measured in the container, the API process peaks at ≈1.15 GB resident
-  (LaBSE weights memory-mapped + random forest + PyTorch; cgroup-charged peak 0.74 GB). The
+  (LaBSE weights memory-mapped + gradient-boosting model + PyTorch; container peak ≈1.4 GB). The
   model loads at startup in ≈10 s. The API runs **one** uvicorn worker on purpose: each
   worker would load its own copy and predictions are serialized by a lock anyway. Scale out
   with more `api` containers, not more workers. `API_MEM_LIMIT` defaults to `4g`; don't go

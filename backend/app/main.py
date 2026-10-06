@@ -1,6 +1,6 @@
 """FastAPI application factory.
 
-Run from the repository root (so both backend/app and the frozen ml/ package import):
+Run from the repository root (so both backend/app and the ml/ package import):
     python -m uvicorn app.main:app --app-dir backend
 """
 
@@ -28,7 +28,7 @@ logger = logging.getLogger("app")
 
 API_PREFIX = "/api/v1"
 DESCRIPTION = """
-Read-only analytics API over YouTube trending snapshots (PostgreSQL `app` schema) and a frozen ML model.
+Read-only analytics API over YouTube trending snapshots (PostgreSQL `app` schema) and an ML model.
 
 **Metric semantics**
 * *Latest snapshot* = each video's latest snapshot **within the filtered dataset** (date range,

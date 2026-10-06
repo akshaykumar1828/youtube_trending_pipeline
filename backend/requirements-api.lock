@@ -1,8 +1,8 @@
 # Exact runtime dependencies of the API container (backend/Dockerfile).
 #
 # Generated from the local environment that passes the backend + ML test suites (Python 3.14),
-# so the container runs the same library versions that produced the frozen model's reference
-# outputs. scikit-learn MUST stay 1.8.0: model/*.pkl were pickled with it.
+# so the container runs the same library versions that produced the model's reference
+# outputs. scikit-learn MUST stay 1.8.0: model/trending_model_v3.joblib was saved with it.
 #
 # torch is installed separately from the CPU-only PyTorch index (no CUDA libraries; inference
 # runs on CPU), so it is not listed here. Development/test tools live in requirements-dev.txt.

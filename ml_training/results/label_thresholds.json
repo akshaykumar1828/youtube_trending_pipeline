@@ -1,0 +1,33 @@
+{
+  "description": "Label rule thresholds: medians over each country's first trending appearances (per video and country), 2024-10-12 to 2026-01-05. High performer = views >= view_threshold AND likes >= like_threshold AND comments >= comment_threshold.",
+  "view_threshold": {
+    "AU": 115306.2622,
+    "CA": 89191.3754,
+    "GB": 72510.4427,
+    "IE": 203290.3071,
+    "IN": 100000.0,
+    "NZ": 265971.3425,
+    "US": 80755.4696,
+    "ZA": 121617.2493
+  },
+  "like_threshold": {
+    "AU": 9233.0,
+    "CA": 7185.0,
+    "GB": 5036.5,
+    "IE": 16817.0,
+    "IN": 5550.0,
+    "NZ": 20835.0,
+    "US": 6137.0,
+    "ZA": 5924.0
+  },
+  "comment_threshold": {
+    "AU": 782.0,
+    "CA": 630.0,
+    "GB": 459.5,
+    "IE": 942.0,
+    "IN": 160.0,
+    "NZ": 1237.0,
+    "US": 566.0,
+    "ZA": 431.0
+  }
+}

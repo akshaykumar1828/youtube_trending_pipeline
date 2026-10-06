@@ -48,7 +48,7 @@ describe('Predictions page', () => {
     expect(screen.getByRole('status')).toBeInTheDocument();
     expect(await screen.findByText(/A video is labelled high-performing/)).toBeInTheDocument();
     expect(screen.getByText('Singapore (SG) is not supported.')).toBeInTheDocument();
-    expect(screen.getByText('0.894')).toBeInTheDocument();
+    expect(screen.getByText('0.923')).toBeInTheDocument();
     const category = screen.getByLabelText(/^Category/);
     expect(
       within(category)
@@ -122,9 +122,8 @@ describe('Predictions page', () => {
       await screen.findByRole('heading', { name: 'High-performance probability' }),
     ).toHaveFocus();
     expect(screen.getByText('93.9%')).toBeInTheDocument();
-    expect(screen.getByText('81.5%')).toBeInTheDocument();
-    expect(screen.getByText('82.1%')).toBeInTheDocument();
-    expect(screen.getByText('56.3%')).toBeInTheDocument();
+    expect(screen.getByText('81.5%')).toBeInTheDocument(); // text score
+    expect(screen.queryByText('Channel & numeric')).not.toBeInTheDocument();
     expect(screen.getByText('India (IN)', { selector: 'dd' })).toBeInTheDocument();
     expect(screen.getByText('Sports', { selector: 'dd' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Score video' })).toBeEnabled();
